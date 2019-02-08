@@ -175,7 +175,6 @@ class BulletObj
                 Vec2f hitpos = hit.hitpos;
                 if (hit.blob !is null) // blob
                 {                    
-                    //print(a + "blob");
                     if (hit.blob.getTeamNum() != TeamNum && hit.blob.hasTag("flesh"))
                     {    
                         if(!map.rayCastSolid(LastPos, CurrentPos))
@@ -194,14 +193,14 @@ class BulletObj
                     }
                 }
                 else
-                {
+                { 
                     if(isClient())
                     {
                         Sound::Play("BulletImpact.ogg", hitpos, 1.5f);
                     }
                     CurrentPos = hitpos;
                     TimeLeft = 0;
-                    break;
+                    //break;
                 }
             }
         }
@@ -210,29 +209,24 @@ class BulletObj
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
     {
-        
-        print(lastDelta + "a");
-        lastDelta = 30 * getRenderExactDeltaTime();
-        print(lastDelta + "b"); 
-        /*
-                print(lastDelta + "a");
-        lastDelta = (lastDelta % 1.0f) + (getRenderDeltaTime() * 30);
-        print(lastDelta + "b");
-        */
+                
+        lastDelta += 30 * getRenderDeltaTime();
+
 		Vec2f newPos = Vec2f(lerp(LastPos.x, CurrentPos.x, lastDelta), lerp(LastPos.y, CurrentPos.y, lastDelta));
-        //print("a" +newPos + " | " + lastDelta);
+
 		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();
 
 
-        Vec2f TopLeft = Vec2f(newPos.x -1, newPos.y-2);
+        Vec2f TopLeft  = Vec2f(newPos.x -1, newPos.y-2);
         Vec2f TopRight = Vec2f(newPos.x -1, newPos.y+2);
-        Vec2f BotLeft = Vec2f(newPos.x + 1, newPos.y-2);
-        Vec2f BotRight = Vec2f(newPos.x +1,newPos.y+2);
+        Vec2f BotLeft  = Vec2f(newPos.x +1, newPos.y-2);
+        Vec2f BotRight = Vec2f(newPos.x +1, newPos.y+2);
 
         angle = (angle % 360) + 90;
-        BotLeft.RotateBy(-angle,newPos);
+
+        BotLeft.RotateBy( -angle,newPos);
         BotRight.RotateBy(-angle,newPos);
-        TopLeft.RotateBy(-angle,newPos);
+        TopLeft.RotateBy( -angle,newPos);
         TopRight.RotateBy(-angle,newPos);
 
         //BulletGrouped.addFade(TopLeft, BotLeft, liTopRight, liBotRight,bulletRnum);
@@ -241,10 +235,10 @@ class BulletObj
         //liBotRight = BotRight;
         //print(liTopRight + " | " + liBotRight + " b");
 
-        v_r_bullet.push_back(Vertex(TopLeft.x,TopLeft.y,        1, 0, 0, SColor(255,255,255,255))); //top left
+        v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
 		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
-		v_r_bullet.push_back(Vertex(BotRight.x,BotRight.y,      1, 1, 1, SColor(255,255,255,255))); //bot right
-		v_r_bullet.push_back(Vertex(BotLeft.x, BotLeft.y,       1, 0, 1, SColor(255,255,255,255))); //bot left
+		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     1, 1, 1, SColor(255,255,255,255))); //bot right
+		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      1, 0, 1, SColor(255,255,255,255))); //bot left
     }
 
     
@@ -370,7 +364,7 @@ void ok(CMap@ map,CRules@ rules)
 
     
     //print((getRenderDeltaTime()*100)+"a");
-    //v_r_bullet.clear();
+    v_r_bullet.clear();
     //v_r_fade.clear();
     Render::SetAlphaBlend(true);
     BulletGrouped.FillArray();
