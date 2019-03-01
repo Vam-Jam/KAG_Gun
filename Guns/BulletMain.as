@@ -160,14 +160,13 @@ class BulletObj
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
         CurrentPos = (((dir * 35) - (Velocity * 35))) + CurrentPos;
-    
         //End
 
 
 
-
+        bool endBullet = false;
         HitInfo@[] list;
-        if(map.getHitInfosFromRay(CurrentPos, -(LastPos - CurrentPos).Angle(), (LastPos - CurrentPos).Length(), null, @list))
+        if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), null, @list))
         {
             for(int a = 0; a < list.length(); a++)
             {
@@ -180,7 +179,7 @@ class BulletObj
                     {
                         if(blob.isCollidable())
                         {
-                            TimeLeft = 0;
+                            endBullet = true;
                         }
                     }    
                     else if(blob.getName() == "wooden_platform")
@@ -195,22 +194,19 @@ class BulletObj
                         {
                             TimeLeft = 0;
                         }*/
-                    }           
-                    if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
+                    }          
+                    else if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
                     {    
-                        if(!map.rayCastSolid(LastPos, CurrentPos))
+                        if(isServer())
                         {
-                            if(isServer())
-                            {
-                                blob.server_Hit(blob, hitpos, Vec2f(0, 0), 1.0f, Hitters::arrow); 
-                            }
-                            else
-                            {
-                                Sound::Play("ArrowHitFlesh.ogg", hitpos, 1.5f); 
-                            } 
+                            blob.server_Hit(blob, hitpos, Vec2f(0, 0), 1.0f, Hitters::arrow); 
                         }
+                        else
+                        {
+                            Sound::Play("ArrowHitFlesh.ogg", hitpos, 1.5f); 
+                        } 
                         CurrentPos = hitpos;
-                        TimeLeft = 0;
+                        endBullet = true;
                     }
                 }
                 else
@@ -220,17 +216,26 @@ class BulletObj
                         Sound::Play("BulletImpact.ogg", hitpos, 1.5f);
                     }
                     CurrentPos = hitpos;
-                    TimeLeft = 0;
+                    endBullet = true;
+
+                    CParticle@ p = ParticlePixel(CurrentPos, Velocity, SColor(255,244, 220, 66), true, 400);
+                    if (p !is null)
+                    {
+                    }
                     //break;
                 }
             }
+        }
+
+        if(endBullet == true)
+        {
+            TimeLeft = 0;
         }
     
     }
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
-    {
-                
+    {     
         lastDelta += 30 * getRenderDeltaTime();
 
 		Vec2f newPos = Vec2f(lerp(LastPos.x, CurrentPos.x, lastDelta), lerp(LastPos.y, CurrentPos.y, lastDelta));
@@ -238,10 +243,10 @@ class BulletObj
 		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();
 
 
-        Vec2f TopLeft  = Vec2f(newPos.x -1, newPos.y-2);
-        Vec2f TopRight = Vec2f(newPos.x -1, newPos.y+2);
-        Vec2f BotLeft  = Vec2f(newPos.x +1, newPos.y-2);
-        Vec2f BotRight = Vec2f(newPos.x +1, newPos.y+2);
+        Vec2f TopLeft  = Vec2f(newPos.x -0.7, newPos.y-3);
+        Vec2f TopRight = Vec2f(newPos.x -0.7, newPos.y+3);
+        Vec2f BotLeft  = Vec2f(newPos.x +0.7, newPos.y-3);
+        Vec2f BotRight = Vec2f(newPos.x +0.7, newPos.y+3);
 
         angle = (angle % 360) + 90;
 
@@ -327,7 +332,6 @@ class BulletHolder
 
     void AddNewObj(BulletObj@ this)
     {
-        //print("pew");
         bullets.push_back(this);
     }
     
@@ -366,7 +370,6 @@ void Reset(CRules@ this)
 	BulletGrouped.Clean();
 	Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
     Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
-	//Render::SetTransformWorldspace();
 }
 
 void onTick(CRules@ this)
@@ -383,7 +386,7 @@ void SeeMeFlyyyy(int id)//New onRender
 
 void ok(CMap@ map,CRules@ rules)
 {
-    //print((getRenderDeltaTime()*100)+"a");
+
     v_r_bullet.clear();
     //v_r_fade.clear();
     Render::SetAlphaBlend(true);
@@ -392,11 +395,7 @@ void ok(CMap@ map,CRules@ rules)
     {
         Render::RawQuads("Bullet.png", v_r_bullet);
     }
-    
-    /*if(v_r_fade.length() > 0)
-    {
-        Render::RawQuads("Fade.png",v_r_fade);
-    }*/
+
 }
 
 void GUIStuff(int id)//Second new render
@@ -463,10 +462,10 @@ void renderScreenpls()
                     Render::SetAlphaBlend(true);
                     Render::RawQuads("ammoBorder.png", v_r_reloadBox);
 
-                    pos = Vec2f(15,getScreenHeight()/1.08);
+                    pos = Vec2f(15,getScreenHeight() - 68);
                     GUI::DrawText(clip+"/"+total, pos, eatUrGreens);
 
-                    pos = Vec2f(15,getScreenHeight()/1.067);
+                    pos = Vec2f(15,getScreenHeight() - 58);
 
                     if(b.get_bool("doReload")) 
                     {
