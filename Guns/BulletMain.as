@@ -174,14 +174,35 @@ class BulletObj
                 HitInfo@ hit = list[a];
                 Vec2f hitpos = hit.hitpos;
                 if (hit.blob !is null) // blob
-                {                    
-                    if (hit.blob.getTeamNum() != TeamNum && hit.blob.hasTag("flesh"))
+                {   
+                    CBlob@ blob = @hit.blob;
+                    if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
+                    {
+                        if(blob.isCollidable())
+                        {
+                            TimeLeft = 0;
+                        }
+                    }    
+                    else if(blob.getName() == "wooden_platform")
+                    {
+                        /*f32 platform_angle = blob.getAngleDegrees();	
+                        print(platform_angle + " a "+  (((LastPos - CurrentPos).Angle() + 90) % 360 ));
+                        Vec2f direction = Vec2f(0.0f, -1.0f);
+                        direction.RotateBy(platform_angle);
+                        float velocity_angle = direction.AngleWith(Velocity);
+
+                        if(!(velocity_angle > -90.0f && velocity_angle < 90.0f))
+                        {
+                            TimeLeft = 0;
+                        }*/
+                    }           
+                    if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
                     {    
                         if(!map.rayCastSolid(LastPos, CurrentPos))
                         {
                             if(isServer())
                             {
-                                hit.blob.server_Hit(hit.blob, hitpos, Vec2f(0, 0), 1.0f, Hitters::arrow); 
+                                blob.server_Hit(blob, hitpos, Vec2f(0, 0), 1.0f, Hitters::arrow); 
                             }
                             else
                             {
@@ -326,8 +347,8 @@ BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
 Vertex[] v_r_fade;
 Vertex[] v_r_reloadBox;
-const SColor RED = SColor(255,255,0,0);
-
+SColor white = SColor(255,255,255,255);
+SColor eatUrGreens = SColor(255,0,255,0);
 
 void onRestart(CRules@ this)
 {
@@ -395,51 +416,82 @@ void renderScreenpls()
 
         if(b !is null && p !is null) 
         {
-            if(p.isMyPlayer() && b.isAttached())
+            if(b.exists("clip"))
             {
-                uint8 clip = b.get_u8("clip");
-                uint8 total = b.get_u8("total");
-                    
-                Vec2f pos = Vec2f(getScreenWidth()/30,getScreenHeight()/5);
-                if(v_r_reloadBox.length() < 1)
+                if(p.isMyPlayer() && b.isAttached())
                 {
-                    print("trueee");
-                    v_r_reloadBox.push_back(Vertex(pos.x, pos.y + 50,     1, 1, 0, RED)); //top right
-                    v_r_reloadBox.push_back(Vertex(pos.x, pos.y,     1, 0, 0, RED)); //top left
-                    v_r_reloadBox.push_back(Vertex(pos.x + 100, pos.y,     1, 0, 1, RED)); //bot left
-                    v_r_reloadBox.push_back(Vertex(pos.x + 100, pos.y + 50,     1, 1, 1, RED)); //bot right
+                    uint8 clip = b.get_u8("clip");
+                    uint8 total = b.get_u8("total");
+                    CControls@ controls = getControls();
+                    Vec2f pos = Vec2f(0,getScreenHeight()-80);
+                    bool render = false;
+
+                    if(controls !is null)
+                    {
+                        int length = (pos - controls.getMouseScreenPos() - Vec2f(-30,-35)).Length();
+
+                        if(length < 256 && length > 0)
+                        {
+                            white.setAlpha(length);
+                            eatUrGreens.setAlpha(length);
+                            render = true;
+                        }
+                        else
+                        {
+                            length=-length;
+                            if(length < 256 && length > 0)
+                            {
+                                white.setAlpha(length);
+                                eatUrGreens.setAlpha(length);
+                                render = true;
+                            }
+                        }
+                    }
+                        
+                    if(v_r_reloadBox.length() < 1 || render)
+                    {
+                        if(render)
+                        {
+                            v_r_reloadBox.clear();
+                        }
+                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y,     1, 1, 0, white)); //top right
+                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y,     1, 0, 0, white)); //top left
+                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     1, 0, 1, white)); //bot left
+                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80,     1, 1, 1, white)); //bot right
+                    }
+                    Render::SetTransformScreenspace();
+                    Render::SetAlphaBlend(true);
+                    Render::RawQuads("ammoBorder.png", v_r_reloadBox);
+
+                    pos = Vec2f(15,getScreenHeight()/1.08);
+                    GUI::DrawText(clip+"/"+total, pos, eatUrGreens);
+
+                    pos = Vec2f(15,getScreenHeight()/1.067);
+
+                    if(b.get_bool("doReload")) 
+                    {
+                        GUI::DrawText("Reloading...", pos, eatUrGreens);
+                    } 
+                    else if(clip == 0 && total > 0 && !b.get_bool("beginReload")) 
+                    {
+                        GUI::DrawText("Press R to \nreload!", pos, eatUrGreens);
+                    } 
+                    else if(clip == 0 && total == 0) 
+                    {
+                        GUI::DrawText("No more \nammo, find \nanother \nweapon!", pos, eatUrGreens);
+                    }
+
                 }
-                Render::SetTransformScreenspace();
-                Render::RawQuads("ammoBorder.png", v_r_reloadBox);
-
-                f32 posY = getScreenHeight()/3 + Maths::Sin(getGameTime() / 3.0f) * 5.0f;
-
-                if(b.get_bool("doReload")) 
-                {
-                    pos = Vec2f(getScreenWidth() / 2 - 60, posY);
-                    GUI::DrawText("Reloading...", pos, RED);
-                } 
-                else if(clip == 0 && total > 0 && !b.get_bool("beginReload")) 
-                {
-                    pos = Vec2f(getScreenWidth() / 2 - 60, posY);
-                    GUI::DrawText("Press R to reload!", pos, RED);
-                } 
-                else if(clip == 0 && total == 0) 
-                {
-                    pos = Vec2f(getScreenWidth() / 2 - 110, posY);
-                    GUI::DrawText("No more ammo, find another weapon!", pos, RED);
-                }
-
             }
-        }
-        else
-        {
-            if(v_r_reloadBox.length() > 0)
+            else
             {
-                print("done");
-                v_r_reloadBox.clear();
+                if(v_r_reloadBox.length() > 0)
+                {
+                    v_r_reloadBox.clear();
+                }
             }
-        }
+        }   
+           
     }
 }
 
