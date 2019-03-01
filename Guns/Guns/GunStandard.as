@@ -1,0 +1,73 @@
+void shoot(CBlob@ this, const f32 aimangle, CBlob@ holder) 
+{
+	CRules@ rules = getRules();
+	CBitStream params;
+	params.write_Vec2f(this.getPosition());
+	params.write_f32(aimangle);
+	params.write_bool(this.isFacingLeft());
+	params.write_u8(this.getTeamNum());
+	params.write_netid(holder.getNetworkID());
+	rules.SendCommand(rules.getCommandID("addTest"), params);
+}
+
+void reload(CBlob@ this, CBlob@ holder) 
+{
+	CBitStream params;
+	params.write_Vec2f(this.getPosition());
+	params.write_netid(holder.getNetworkID());
+	this.SendCommand(this.getCommandID("reload"), params);
+}
+
+void onCommand(CBlob@ this, u8 cmd, CBitStream @params) 
+{
+	CSprite@ sprite = this.getSprite();
+	if(cmd == this.getCommandID("reload")) 
+	{
+		int currentTotalAmount = this.get_u8("total");
+		int currentClipAmount = this.get_u8("clip");
+		int neededClipAmount = CLIP - currentClipAmount;
+		
+		if(currentTotalAmount >= neededClipAmount) 
+		{
+			this.set_u8("clip", CLIP);
+			currentTotalAmount -= neededClipAmount;
+			this.set_u8("total", currentTotalAmount);
+		} 
+		else 
+		{
+			this.set_u8("clip", currentTotalAmount);
+			currentTotalAmount = 0;
+			this.set_u8("total", currentTotalAmount);
+		}
+	}
+}
+
+void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint) 
+{
+	this.getCurrentScript().runFlags &= ~Script::tick_not_sleeping;
+	this.SetDamageOwnerPlayer(attached.getPlayer());
+
+	CSprite@ sprite = this.getSprite();
+	sprite.PlaySound("PickupGun.ogg");
+}
+
+void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint) 
+{
+    CSprite@ sprite = this.getSprite();
+    sprite.ResetTransform();
+    sprite.animation.frame = 0;
+
+    Vec2f aimvector = detached.getAimPos() - this.getPosition();
+ 	f32 angle = 0 - aimvector.Angle() + (this.isFacingLeft() == true ? 180.0f : 0);
+    this.setAngleDegrees(angle);
+
+    //Reset reload and interval
+    this.set_bool("beginReload", false);
+	this.set_bool("doReload", false);
+	this.set_u8("actionInterval", 0);
+
+	if(this.get_u8("clip") == 0 && this.get_u8("total") == 0) 
+	{
+		this.server_SetTimeToDie(5);
+	}
+}
