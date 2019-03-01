@@ -250,9 +250,7 @@ class BulletHolder
     BulletObj[] bullets;
     BulletFade[] fade;
 
-	BulletHolder()
-	{
-	}
+	BulletHolder(){}
 
     void FakeOnTick(CRules@ this)
     {
@@ -327,6 +325,8 @@ class BulletHolder
 BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
 Vertex[] v_r_fade;
+Vertex[] v_r_reloadBox;
+const SColor RED = SColor(255,255,0,0);
 
 
 void onRestart(CRules@ this)
@@ -344,6 +344,7 @@ void Reset(CRules@ this)
 {
 	BulletGrouped.Clean();
 	Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
+    Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
 	//Render::SetTransformWorldspace();
 }
 
@@ -361,8 +362,6 @@ void SeeMeFlyyyy(int id)//New onRender
 
 void ok(CMap@ map,CRules@ rules)
 {
-
-    
     //print((getRenderDeltaTime()*100)+"a");
     v_r_bullet.clear();
     //v_r_fade.clear();
@@ -377,8 +376,73 @@ void ok(CMap@ map,CRules@ rules)
     {
         Render::RawQuads("Fade.png",v_r_fade);
     }*/
-    
 }
+
+void GUIStuff(int id)//Second new render
+{
+    renderScreenpls();
+}
+
+
+void renderScreenpls()
+{
+    ///Bullet Ammo
+    CBlob@ holder = getLocalPlayerBlob();           
+    if(holder !is null) 
+    {
+        CBlob@ b = holder.getAttachments().getAttachmentPointByName("PICKUP").getOccupied(); 
+        CPlayer@ p = holder.getPlayer(); 
+
+        if(b !is null && p !is null) 
+        {
+            if(p.isMyPlayer() && b.isAttached())
+            {
+                uint8 clip = b.get_u8("clip");
+                uint8 total = b.get_u8("total");
+                    
+                Vec2f pos = Vec2f(getScreenWidth()/30,getScreenHeight()/5);
+                if(v_r_reloadBox.length() < 1)
+                {
+                    print("trueee");
+                    v_r_reloadBox.push_back(Vertex(pos.x, pos.y + 50,     1, 1, 0, RED)); //top right
+                    v_r_reloadBox.push_back(Vertex(pos.x, pos.y,     1, 0, 0, RED)); //top left
+                    v_r_reloadBox.push_back(Vertex(pos.x + 100, pos.y,     1, 0, 1, RED)); //bot left
+                    v_r_reloadBox.push_back(Vertex(pos.x + 100, pos.y + 50,     1, 1, 1, RED)); //bot right
+                }
+                Render::SetTransformScreenspace();
+                Render::RawQuads("ammoBorder.png", v_r_reloadBox);
+
+                f32 posY = getScreenHeight()/3 + Maths::Sin(getGameTime() / 3.0f) * 5.0f;
+
+                if(b.get_bool("doReload")) 
+                {
+                    pos = Vec2f(getScreenWidth() / 2 - 60, posY);
+                    GUI::DrawText("Reloading...", pos, RED);
+                } 
+                else if(clip == 0 && total > 0 && !b.get_bool("beginReload")) 
+                {
+                    pos = Vec2f(getScreenWidth() / 2 - 60, posY);
+                    GUI::DrawText("Press R to reload!", pos, RED);
+                } 
+                else if(clip == 0 && total == 0) 
+                {
+                    pos = Vec2f(getScreenWidth() / 2 - 110, posY);
+                    GUI::DrawText("No more ammo, find another weapon!", pos, RED);
+                }
+
+            }
+        }
+        else
+        {
+            if(v_r_reloadBox.length() > 0)
+            {
+                print("done");
+                v_r_reloadBox.clear();
+            }
+        }
+    }
+}
+
 
 
 void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
@@ -398,5 +462,4 @@ float lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;
 }
-
 

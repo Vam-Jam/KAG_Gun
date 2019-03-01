@@ -5,8 +5,8 @@ const float BULLET_DAMAGE = 1;
 const uint8 PROJECTILE_SPEED = 20; 
 const float TIME_TILL_DIE = 0.3;
 
-const uint8 CLIP = 30;
-const uint8 TOTAL = 120;
+const uint8 CLIP = 5;
+const uint8 TOTAL = 5;
 const uint8 RELOAD_TIME = 30;
 
 const string AMMO_TYPE = "bullet";
