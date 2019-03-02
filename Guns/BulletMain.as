@@ -1,4 +1,4 @@
-#include "Hitters.as";
+#include "GunHitters.as";
 
 
 class BulletFade//todo trail effect
@@ -102,42 +102,39 @@ class BulletFade//todo trail effect
 
 class BulletObj
 {
+    CBlob@ hoomanShooter;
+    CBlob@ gunBlob;
     Vec2f CurrentPos;
     Vec2f LastPos;
 	Vec2f RenderPos;
     Vec2f liTopRight;
     Vec2f liBotRight;
     f32 StartingAimPos;
-    s8 TimeLeft = 120;
+    s8 TimeLeft;
     Vec2f Velocity;
     bool FacingLeft;
     u8 TeamNum;
-    u8 bulletRnum;
     f32 lastDelta;
+    Vec2f GunVelo;
+    float Damage;
+    Vec2f KB;
     
-
-	BulletObj(Vec2f startPos, Vec2f AimPos, bool isFacingLeft)
+	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle )
 	{
-        CurrentPos = startPos;
-        SetStartAimPos(AimPos,isFacingLeft);
-        FacingLeft = isFacingLeft;
-        Velocity = Vec2f(0,5);
-        LastPos = startPos;
-		RenderPos = startPos;
-	}
-
-	BulletObj(Vec2f startPos, f32 AimPos,bool isFacingLeft,u8 teamNum)
-	{
-        CurrentPos = startPos;
-        StartingAimPos = AimPos;
-        FacingLeft = isFacingLeft;
-        LastPos = startPos;
-        TeamNum = teamNum;
-		RenderPos = startPos;
-        //LastInterpPos = CurrentPos;
+        CurrentPos = humanBlob.getPosition();
+        FacingLeft = humanBlob.isFacingLeft();
+        GunVelo  = gun.get_Vec2f("speed");
+        Damage   = gun.get_f32("damage");
+        TeamNum  = gun.getTeamNum();
+        TimeLeft = gun.get_u8("TTL");
+        KB       = gun.get_Vec2f("KB");
+        @hoomanShooter = humanBlob;
+        StartingAimPos = angle;
+        LastPos    = CurrentPos;
+		RenderPos  = CurrentPos;
         liTopRight = CurrentPos;
         liBotRight = CurrentPos;
-        bulletRnum = XORRandom(4);
+        @gunBlob   = gun;
         lastDelta = 0;
 	}
 
@@ -155,7 +152,7 @@ class BulletObj
         lastDelta = 0;
         LastPos = CurrentPos;
         TimeLeft--;
-        Velocity -= Vec2f(0,0.025);
+        Velocity -= GunVelo;
         f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
@@ -163,10 +160,9 @@ class BulletObj
         //End
 
 
-
         bool endBullet = false;
         HitInfo@[] list;
-        if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), null, @list))
+        if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), hoomanShooter, @list))
         {
             for(int a = 0; a < list.length(); a++)
             {
@@ -199,7 +195,7 @@ class BulletObj
                     {    
                         if(isServer())
                         {
-                            blob.server_Hit(blob, hitpos, Vec2f(0, 0), 1.0f, Hitters::arrow); 
+                            hoomanShooter.server_Hit(blob, hitpos, Vec2f(0, 0), Damage, GunHitters::bullet); 
                         }
                         else
                         {
@@ -362,7 +358,7 @@ void onRestart(CRules@ this)
 void onInit(CRules@ this)
 {
 	Reset(this);
-    this.addCommandID("addTest");
+    this.addCommandID("fireGun");
 }
 
 void Reset(CRules@ this)
@@ -497,15 +493,16 @@ void renderScreenpls()
 
 
 void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
-	if(cmd == this.getCommandID("addTest")) {
-        Vec2f pos = params.read_Vec2f();
-        f32 angle = params.read_f32();
-        bool isFacingLeft = params.read_bool();
-        u8 teamNum = params.read_u8();
-        BulletObj@ tempObj = BulletObj(pos, angle, isFacingLeft, teamNum);
-        //print(angle+" Aa " + pos.Angle());
-        BulletGrouped.AddNewObj(tempObj);
-        //print(BulletGrouped.bullets.length() + " aa");
+	if(cmd == this.getCommandID("fireGun"))
+    {
+        CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());
+        CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
+
+        if(hoomanBlob !is null && gunBlob !is null)
+        {  
+            f32 angle = params.read_f32();
+            BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle));
+        }
     }
 }
 

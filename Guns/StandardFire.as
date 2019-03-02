@@ -15,7 +15,15 @@ void onInit(CBlob@ this)
 
     this.set_u8("clip", CLIP);
     this.set_u8("total", TOTAL);
-	
+
+	//Vams new stuff
+	this.set_u8("spread", B_SPREAD);
+	this.set_u8("TTL", B_TTL);
+	this.set_Vec2f("KB", B_KB);
+	this.set_Vec2f("speed",B_SPEED);
+	this.set_f32("damage",B_DAMAGE);
+	//
+
 	this.set_bool("beginReload", false);
 	this.set_bool("doReload", false);
 	this.set_u8("actionInterval", 0);

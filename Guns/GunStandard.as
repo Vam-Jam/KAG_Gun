@@ -2,12 +2,11 @@ void shoot(CBlob@ this, const f32 aimangle, CBlob@ holder)
 {
 	CRules@ rules = getRules();
 	CBitStream params;
-	params.write_Vec2f(this.getPosition());
-	params.write_f32(aimangle);
-	params.write_bool(this.isFacingLeft());
-	params.write_u8(this.getTeamNum());
+
 	params.write_netid(holder.getNetworkID());
-	rules.SendCommand(rules.getCommandID("addTest"), params);
+	params.write_netid(this.getNetworkID());
+	params.write_f32(aimangle);
+	rules.SendCommand(rules.getCommandID("fireGun"), params);
 }
 
 void reload(CBlob@ this, CBlob@ holder) 
