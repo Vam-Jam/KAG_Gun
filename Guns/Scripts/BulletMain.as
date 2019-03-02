@@ -161,6 +161,8 @@ class BulletObj
 
 
         bool endBullet = false;
+        bool doorHit = false;
+        CBlob@[] blobList;
         HitInfo@[] list;
         if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), hoomanShooter, @list))
         {
@@ -175,7 +177,9 @@ class BulletObj
                     {
                         if(blob.isCollidable())
                         {
+                            CurrentPos = hitpos;
                             endBullet = true;
+                            doorHit = true;
                         }
                     }    
                     else if(blob.getName() == "wooden_platform")
@@ -193,14 +197,7 @@ class BulletObj
                     }          
                     else if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
                     {    
-                        if(isServer())
-                        {
-                            hoomanShooter.server_Hit(blob, hitpos, Vec2f(0, 0), Damage, GunHitters::bullet); 
-                        }
-                        else
-                        {
-                            Sound::Play("ArrowHitFlesh.ogg", hitpos, 1.5f); 
-                        } 
+                        blobList.push_back(blob);
                         CurrentPos = hitpos;
                         endBullet = true;
                     }
@@ -214,10 +211,7 @@ class BulletObj
                     CurrentPos = hitpos;
                     endBullet = true;
 
-                    CParticle@ p = ParticlePixel(CurrentPos, Velocity, SColor(255,244, 220, 66), true, 400);
-                    if (p !is null)
-                    {
-                    }
+                    ParticlePixel(CurrentPos, Velocity, SColor(255,244, 220, 66), true, 400);
                     //break;
                 }
             }
@@ -227,6 +221,26 @@ class BulletObj
         {
             TimeLeft = 0;
         }
+
+        if(blobList.length() > 0)
+        {
+            if(!doorHit)
+            {
+                for(int a = 0; a < blobList.length(); a++)
+                {
+                    CBlob@ blob = blobList[a];
+                    if(isServer())
+                    {
+                        hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                    }
+                    else
+                    {
+                        Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
+                    }
+                } 
+            }
+        }
+
     
     }
 
