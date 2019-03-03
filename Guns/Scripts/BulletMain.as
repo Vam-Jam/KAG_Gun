@@ -161,7 +161,6 @@ class BulletObj
 
 
         bool endBullet = false;
-        bool doorHit = false;
         CBlob@[] blobList;
         HitInfo@[] list;
         if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), hoomanShooter, @list))
@@ -179,7 +178,7 @@ class BulletObj
                         {
                             CurrentPos = hitpos;
                             endBullet = true;
-                            doorHit = true;
+                            break;
                         }
                     }    
                     else if(blob.getName() == "wooden_platform")
@@ -197,8 +196,15 @@ class BulletObj
                     }          
                     else if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
                     {    
-                        blobList.push_back(blob);
-                        CurrentPos = hitpos;
+                        CurrentPos = hitpos;           
+                        if(isServer())
+                        {
+                            hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                        }
+                        else
+                        {
+                            Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
+                        }
                         endBullet = true;
                     }
                 }
@@ -221,26 +227,6 @@ class BulletObj
         {
             TimeLeft = 0;
         }
-
-        if(blobList.length() > 0)
-        {
-            if(!doorHit)
-            {
-                for(int a = 0; a < blobList.length(); a++)
-                {
-                    CBlob@ blob = blobList[a];
-                    if(isServer())
-                    {
-                        hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
-                    }
-                    else
-                    {
-                        Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
-                    }
-                } 
-            }
-        }
-
     
     }
 
