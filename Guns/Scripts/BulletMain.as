@@ -111,7 +111,8 @@ class BulletObj
     Vec2f liBotRight;
     f32 StartingAimPos;
     s8 TimeLeft;
-    Vec2f Velocity;
+    Vec2f FakeVelocity;
+    Vec2f TrueVelocity;
     bool FacingLeft;
     u8 TeamNum;
     f32 lastDelta;
@@ -152,16 +153,16 @@ class BulletObj
         lastDelta = 0;
         LastPos = CurrentPos;
         TimeLeft--;
-        Velocity -= GunVelo;
+        FakeVelocity -= GunVelo;
         f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
-        CurrentPos = (((dir * 35) - (Velocity * 35))) + CurrentPos;
+        CurrentPos = (((dir * 35) - (FakeVelocity * 35))) + CurrentPos;
+        TrueVelocity = CurrentPos - LastPos;
         //End
 
 
         bool endBullet = false;
-        CBlob@[] blobList;
         HitInfo@[] list;
         if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), hoomanShooter, @list))
         {
@@ -216,8 +217,14 @@ class BulletObj
                     }
                     CurrentPos = hitpos;
                     endBullet = true;
-
-                    ParticlePixel(CurrentPos, Velocity, SColor(255,244, 220, 66), true, 400);
+                    print((-TrueVelocity) + " a");
+                    CParticle@ p = ParticlePixel(CurrentPos, -TrueVelocity / 10, SColor(255,244, 220, 66),true);
+                    if(p !is null)
+                    {
+                        p.fadeout = true;
+                        p.fastcollision = true;
+                        p.bounce = 0.4f;
+                    }
                     //break;
                 }
             }
