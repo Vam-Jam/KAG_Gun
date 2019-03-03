@@ -1,4 +1,4 @@
-<h2 align = 'center'><img src="https://i.imgur.com/Fqd5YKI.png"><br>KAG ww2 Gun Rework</h2>
+<h2 align = 'center'><img src="https://forum.thd.vg/data/resource_icons/0/572.jpg?1551625078"><br>KAG ww2 Gun Rework</h2>
 <p align = 'center'> Currently being developed. Only gun that works is '!ak47'</p>
 
 # To do
