@@ -200,7 +200,7 @@ class BulletObj
                         if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
                         {
                             CurrentPos = hitpos;
-                            if(!blob.hasTag("invincible"))
+                            if(!blob.hasTag("invincible") && !blob.hasTag("seated"))
                             {
                                 if(isServer())
                                 {
@@ -227,11 +227,9 @@ class BulletObj
                     CParticle@ p = ParticlePixel(CurrentPos, getRandomVelocity(-TrueVelocity.Angle(), 3.0f, 40.0f), SColor(255,244, 220, 66),true);
                     if(p !is null)
                     {
-                        p.fadeout = true;
                         p.fastcollision = true;
                         p.bounce = 0.4f;
                     }
-                    //break;
                 }
             }
         }
@@ -240,7 +238,6 @@ class BulletObj
         {
             TimeLeft = 0;
         }
-    
     }
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
@@ -313,6 +310,7 @@ class BulletHolder
             fade[a].TimeLeft -= 1;
         }*/
     }
+
     void addFade(Vec2f topLeft, Vec2f botLeft, Vec2f LiTopRight, Vec2f LiBotRight, u8 bulletRnum)
     {
         BulletFade@ fadeToAdd = BulletFade(topLeft,botLeft,LiTopRight,LiBotRight, bulletRnum);
@@ -320,7 +318,6 @@ class BulletHolder
         fadeToAdd.JoinQueue();
     }
     
-
     void FillArray()
     {
         for(int a = 0; a < bullets.length(); a++)
@@ -354,7 +351,6 @@ class BulletHolder
 		return bullets.length();
 	}
 }
-
 
 BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
