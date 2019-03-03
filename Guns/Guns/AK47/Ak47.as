@@ -6,8 +6,8 @@ const float BULLET_DAMAGE    = 1;   //Unused
 const uint8 PROJECTILE_SPEED = 20;  //Unused
 const float TIME_TILL_DIE    = 0.3; //Unused
 
-const uint8 CLIP        = 5; //Used
-const uint8 TOTAL       = 5; //Used
+const uint8 CLIP        = 255; //Used
+const uint8 TOTAL       = 255; //Used
 const uint8 RELOAD_TIME = 30; //Used, reload timer (in ticks)
 
 
