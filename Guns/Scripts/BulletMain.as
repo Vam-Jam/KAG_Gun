@@ -195,18 +195,25 @@ class BulletObj
                             TimeLeft = 0;
                         }*/
                     }          
-                    else if (blob.getTeamNum() != TeamNum && blob.hasTag("flesh"))
+                    else if (blob.getTeamNum() != TeamNum)
                     {    
-                        CurrentPos = hitpos;           
-                        if(isServer())
+                        if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
                         {
-                            hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                            CurrentPos = hitpos;
+                            if(!blob.hasTag("invincible"))
+                            {
+                                if(isServer())
+                                {
+                                    hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                                }
+                                else
+                                {
+                                    Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
+                                }
+                            }
+                            endBullet = true; 
                         }
-                        else
-                        {
-                            Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
-                        }
-                        endBullet = true;
+                    
                     }
                 }
                 else
@@ -217,8 +224,7 @@ class BulletObj
                     }
                     CurrentPos = hitpos;
                     endBullet = true;
-                    print((-TrueVelocity) + " a");
-                    CParticle@ p = ParticlePixel(CurrentPos, -TrueVelocity / 10, SColor(255,244, 220, 66),true);
+                    CParticle@ p = ParticlePixel(CurrentPos, getRandomVelocity(-TrueVelocity.Angle(), 3.0f, 40.0f), SColor(255,244, 220, 66),true);
                     if(p !is null)
                     {
                         p.fadeout = true;
