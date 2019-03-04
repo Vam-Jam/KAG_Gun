@@ -17,6 +17,8 @@ const Vec2f B_SPEED  = Vec2f(0,0.025); //DEFAULT, bullet stuff is very 'weird' c
 const int8  B_TTL    = 120; //TTL = Time To Live, bullets will live for 120 ticks before getting destory IF nothing has been hit
 const float B_DAMAGE = 1; //1 heart
 const Vec2f B_KB     = Vec2f(0,0); //KnockBack velocity on hit
+const int   B_F_COINS= 2; //Coins on hitting flesh (player or other blobs with 'flesh')
+const int   B_O_COINS= 1; //Coins on hitting objects (like tanks, boulders etc)
 
 
 const string AMMO_TYPE   = "bullet"; //Used i think?

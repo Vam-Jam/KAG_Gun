@@ -22,6 +22,8 @@ void onInit(CBlob@ this)
 	this.set_Vec2f("KB", B_KB);
 	this.set_Vec2f("speed",B_SPEED);
 	this.set_f32("damage",B_DAMAGE);
+	this.set_u16("coins_flesh",B_F_COINS);
+	this.set_u16("coins_object",B_O_COINS);
 	//
 
 	this.set_bool("beginReload", false);

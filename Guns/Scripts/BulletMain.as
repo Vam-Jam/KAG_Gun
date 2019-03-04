@@ -204,7 +204,23 @@ class BulletObj
                             {
                                 if(isServer())
                                 {
+                                    int coins = 0;
                                     hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                                    
+                                    if(blob.hasTag("flesh"))
+                                    {
+                                        coins = gunBlob.get_u16("coins_flesh");
+                                    }
+                                    else
+                                    {
+                                        coins = gunBlob.get_u16("coins_object");
+                                    }
+
+                                    CPlayer@ p = hoomanShooter.getPlayer();
+                                    if(p !is null)
+                                    {
+                                        p.server_setCoins(p.getCoins() + coins);
+                                    }
                                 }
                                 else
                                 {
@@ -222,6 +238,7 @@ class BulletObj
                     {
                         Sound::Play("BulletImpact.ogg", hitpos, 1.5f);
                     }
+
                     CurrentPos = hitpos;
                     endBullet = true;
                     CParticle@ p = ParticlePixel(CurrentPos, getRandomVelocity(-TrueVelocity.Angle(), 3.0f, 40.0f), SColor(255,244, 220, 66),true);
