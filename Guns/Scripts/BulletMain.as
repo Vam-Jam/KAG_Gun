@@ -119,6 +119,8 @@ class BulletObj
     Vec2f GunVelo;
     float Damage;
     Vec2f KB;
+    string FleshHitSound;
+    string ObjectHitSound;
     
 	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle )
 	{
@@ -129,12 +131,15 @@ class BulletObj
         TeamNum  = gun.getTeamNum();
         TimeLeft = gun.get_u8("TTL");
         KB       = gun.get_Vec2f("KB");
+        FleshHitSound = gun.get_string("flesh_hit_sound");
+        ObjectHitSound= gun.get_string("object_hit_sound");
         @hoomanShooter = humanBlob;
         StartingAimPos = angle;
         LastPos    = CurrentPos;
 		RenderPos  = CurrentPos;
         liTopRight = CurrentPos;
         liBotRight = CurrentPos;
+        
         @gunBlob   = gun;
         lastDelta = 0;
 	}
@@ -224,8 +229,9 @@ class BulletObj
                                 }
                                 else
                                 {
-                                    Sound::Play("ArrowHitFlesh.ogg",  CurrentPos, 1.5f); 
+                                    Sound::Play(FleshHitSound,  CurrentPos, 1.5f); 
                                 }
+
                             }
                             endBullet = true; 
                         }
@@ -236,7 +242,7 @@ class BulletObj
                 { 
                     if(isClient())
                     {
-                        Sound::Play("BulletImpact.ogg", hitpos, 1.5f);
+                        Sound::Play(ObjectHitSound, hitpos, 1.5f);
                     }
 
                     CurrentPos = hitpos;

@@ -17,14 +17,17 @@ void onInit(CBlob@ this)
     this.set_u8("total", TOTAL);
 
 	//Vams new stuff
-	this.set_u8("spread", B_SPREAD);
-	this.set_u8("TTL", B_TTL);
-	this.set_Vec2f("KB", B_KB);
-	this.set_Vec2f("speed",B_SPEED);
-	this.set_f32("damage",B_DAMAGE);
-	this.set_u16("coins_flesh",B_F_COINS);
+	this.set_u8("spread"       ,B_SPREAD);
+	this.set_u8("TTL"          ,B_TTL);
+	this.set_Vec2f("KB"        ,B_KB);
+	this.set_Vec2f("speed"     ,B_SPEED);
+	this.set_f32("damage"      ,B_DAMAGE);
+	this.set_u16("coins_flesh" ,B_F_COINS);
 	this.set_u16("coins_object",B_O_COINS);
 	this.Tag(C_TAG);
+
+	this.set_string("flesh_hit_sound" ,S_FLESH_HIT);
+	this.set_string("object_hit_sound",S_OBJECT_HIT);
 	//
 
 	this.set_bool("beginReload", false);
