@@ -104,24 +104,30 @@ class BulletObj
 {
     CBlob@ hoomanShooter;
     CBlob@ gunBlob;
+
+    Vec2f TrueVelocity;
     Vec2f CurrentPos;
-    Vec2f LastPos;
-	Vec2f RenderPos;
     Vec2f liTopRight;
     Vec2f liBotRight;
-    f32 StartingAimPos;
-    s8 TimeLeft;
+    Vec2f BulletGrav;
+    Vec2f RenderPos;
+    Vec2f LastPos;
     Vec2f Gravity;
-    Vec2f TrueVelocity;
-    bool FacingLeft;
+    Vec2f KB;
+
+    f32 StartingAimPos;
+    f32 lastDelta;
+    f32 Damage;
+
     u8 TeamNum;
     u8 Speed;
-    f32 lastDelta;
-    Vec2f BulletGrav;
-    float Damage;
-    Vec2f KB;
+
     string FleshHitSound;
     string ObjectHitSound;
+
+    s8 TimeLeft;
+    
+    bool FacingLeft;
     
 	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle )
 	{

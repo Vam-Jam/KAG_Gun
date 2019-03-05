@@ -108,10 +108,25 @@ void onTick(CBlob@ this)
 					else if(this.get_u8("clip") > 0) 
 					{
 						sprite.PlaySound(FIRE_SOUND);
-						aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
-						shoot(this, aimangle, holder);
-						actionInterval = FIRE_INTERVAL;
-						this.sub_u8("clip",1);
+						if(BUL_PER_SHOT > 1)
+						{
+							actionInterval = FIRE_INTERVAL;
+							f32 tempAngle = aimangle;
+							for(uint8 a = 0; a < BUL_PER_SHOT; a++)
+							{
+								aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
+								shoot(this, aimangle, holder);
+								aimangle = tempAngle;
+								this.sub_u8("clip",1);
+							}
+						}
+						else
+						{
+							aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
+							shoot(this, aimangle, holder);
+							actionInterval = FIRE_INTERVAL;
+							this.sub_u8("clip",1);
+						}
 					}
 					else if(!this.get_bool("beginReload")) 
 					{
