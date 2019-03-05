@@ -11,9 +11,13 @@ const uint8 TOTAL       = 255; //Used
 const uint8 RELOAD_TIME = 30; //Used, reload timer (in ticks)
 
 
+//Contact vam for default values
+//or keep a fresh copy
+
 //NEW BULLET PROPS
 const int8  B_SPREAD = 0; //the higher the value, the more 'uncontrolable' bullets get
-const Vec2f B_SPEED  = Vec2f(0,0.025); //DEFAULT, bullet stuff is very 'weird' currently, use and expirement
+const Vec2f B_GRAV   = Vec2f(0,0.025); //Bullet gravity drop \|/
+const int8  B_SPEED  = 35; //Bullet speed, STRONGLY AFFECTED/EFFECTS B_GRAV
 const int8  B_TTL    = 120; //TTL = Time To Live, bullets will live for 120 ticks before getting destory IF nothing has been hit
 const float B_DAMAGE = 1; //1 heart
 const Vec2f B_KB     = Vec2f(0,0); //KnockBack velocity on hit

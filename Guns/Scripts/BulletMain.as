@@ -111,12 +111,13 @@ class BulletObj
     Vec2f liBotRight;
     f32 StartingAimPos;
     s8 TimeLeft;
-    Vec2f FakeVelocity;
+    Vec2f Gravity;
     Vec2f TrueVelocity;
     bool FacingLeft;
     u8 TeamNum;
+    u8 Speed;
     f32 lastDelta;
-    Vec2f GunVelo;
+    Vec2f BulletGrav;
     float Damage;
     Vec2f KB;
     string FleshHitSound;
@@ -126,11 +127,12 @@ class BulletObj
 	{
         CurrentPos = humanBlob.getPosition();
         FacingLeft = humanBlob.isFacingLeft();
-        GunVelo  = gun.get_Vec2f("speed");
+        BulletGrav = gun.get_Vec2f("grav");
         Damage   = gun.get_f32("damage");
         TeamNum  = gun.getTeamNum();
         TimeLeft = gun.get_u8("TTL");
         KB       = gun.get_Vec2f("KB");
+        Speed    = gun.get_u8("speed");
         FleshHitSound = gun.get_string("flesh_hit_sound");
         ObjectHitSound= gun.get_string("object_hit_sound");
         @hoomanShooter = humanBlob;
@@ -139,7 +141,7 @@ class BulletObj
 		RenderPos  = CurrentPos;
         liTopRight = CurrentPos;
         liBotRight = CurrentPos;
-        
+
         @gunBlob   = gun;
         lastDelta = 0;
 	}
@@ -158,11 +160,11 @@ class BulletObj
         lastDelta = 0;
         LastPos = CurrentPos;
         TimeLeft--;
-        FakeVelocity -= GunVelo;
+        Gravity -= BulletGrav;
         f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
-        CurrentPos = (((dir * 35) - (FakeVelocity * 35))) + CurrentPos;
+        CurrentPos = (((dir * Speed) - (Gravity * Speed))) + CurrentPos;
         TrueVelocity = CurrentPos - LastPos;
         //End
 
