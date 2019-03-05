@@ -48,6 +48,7 @@ void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint)
 
 	CSprite@ sprite = this.getSprite();
 	sprite.PlaySound("PickupGun.ogg");
+	this.server_SetTimeToDie(-1);
 }
 
 void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint) 
@@ -55,6 +56,8 @@ void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint)
     CSprite@ sprite = this.getSprite();
     sprite.ResetTransform();
     sprite.animation.frame = 0;
+	u8 clip = this.get_u8("clip");
+	u8 total = this.get_u8("total");
 
     Vec2f aimvector = detached.getAimPos() - this.getPosition();
  	f32 angle = 0 - aimvector.Angle() + (this.isFacingLeft() == true ? 180.0f : 0);
@@ -65,8 +68,8 @@ void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint)
 	this.set_bool("doReload", false);
 	//this.set_u8("actionInterval", 0);
 
-	if(this.get_u8("clip") == 0 && this.get_u8("total") == 0) 
+	if(clip < CLIP && total <= TOTAL / 1.2)
 	{
-		this.server_SetTimeToDie(5);
+		this.server_SetTimeToDie(T_TO_DIE);
 	}
 }

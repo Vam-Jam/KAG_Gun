@@ -24,6 +24,7 @@ void onInit(CBlob@ this)
 	this.set_f32("damage",B_DAMAGE);
 	this.set_u16("coins_flesh",B_F_COINS);
 	this.set_u16("coins_object",B_O_COINS);
+	this.Tag(C_TAG);
 	//
 
 	this.set_bool("beginReload", false);
@@ -103,6 +104,7 @@ void onTick(CBlob@ this)
 					else if(this.get_u8("clip") > 0) 
 					{
 						sprite.PlaySound(FIRE_SOUND);
+						aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
 						shoot(this, aimangle, holder);
 						actionInterval = FIRE_INTERVAL;
 						this.sub_u8("clip",1);
@@ -121,7 +123,7 @@ void onTick(CBlob@ this)
     else 
     {
 		this.getCurrentScript().runFlags |= Script::tick_not_sleeping; 
-    }			
+    }	
 }
 
 f32 getAimAngle( CBlob@ this, CBlob@ holder )

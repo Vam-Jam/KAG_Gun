@@ -19,6 +19,8 @@ const float B_DAMAGE = 1; //1 heart
 const Vec2f B_KB     = Vec2f(0,0); //KnockBack velocity on hit
 const int   B_F_COINS= 2; //Coins on hitting flesh (player or other blobs with 'flesh')
 const int   B_O_COINS= 1; //Coins on hitting objects (like tanks, boulders etc)
+const int   T_TO_DIE = 1500; //30 * how many seconds before gun disspears if it hasnt been picked up
+const string C_TAG   = "autoRifle"; //Custom TAG, can be used later on ingame for certain ammos etc
 
 
 const string AMMO_TYPE   = "bullet"; //Used i think?
