@@ -11,10 +11,13 @@ class BulletFade//todo trail effect
     u8 Alpha;
     Vec2f TopLeft;
     Vec2f BotLeft;
+    Vec2f TopRight;
+    Vec2f BotRight;
+    Vec2f liTopLeft;
+    Vec2f liBotLeft;
     Vec2f liTopRight;
     Vec2f liBotRight;
-    u8 fadeDir;
-    BulletFade(Vec2f topLeft, Vec2f botLeft, Vec2f LiTopRight, Vec2f LiBotRight, u8 bulletRnum)
+    BulletFade(Vec2f topLeft, Vec2f botLeft, Vec2f topRight, Vec2f botRight, Vec2f LiTopLeft, Vec2f LiBotLeft, Vec2f LiTopRight, Vec2f LiBotRight)
     {
         //print("hello world");
         //Pos = CurrentPos;
@@ -25,9 +28,13 @@ class BulletFade//todo trail effect
         Col = SColor(255, 255, 174, 61);
         TopLeft = topLeft;
         BotLeft = botLeft;
+        TopRight = topRight;
+        BotRight = botRight;
+        liTopLeft = LiTopLeft;
+        liBotLeft = LiBotLeft;
         liTopRight = LiTopRight;
         liBotRight = LiBotRight;
-        fadeDir = bulletRnum;
+
     }
 
     void JoinQueue()
@@ -39,64 +46,21 @@ class BulletFade//todo trail effect
             Alpha = 0;
         }
         Alpha -= 5 * (60 * getRenderDeltaTime());
-        //print(Alpha + " a");
+
         Col.setBlue(Col.getBlue() + 1);
         Col.setGreen(Col.getGreen() - 1);
         Col.setAlpha(Alpha);
         float toAdd = 0.20 * ((60 * getRenderDeltaTime()));
-        //print(toAdd + "a");
-        /*switch(fadeDir)
-        {
-            case 3:
-            case 0:
-            {
-                liBotRight.x -= toAdd;
-                liTopRight.x -= toAdd;
-                TopLeft.x -= toAdd;
-                BotLeft.x -= toAdd;
-                liBotRight.y += toAdd;
-                liTopRight.y += toAdd;
-                TopLeft.y += toAdd;
-                BotLeft.y += toAdd;
-                break;
-            }
 
-            case 1:
-            {
-                liBotRight.x -= toAdd;
-                liTopRight.x -= toAdd;
-                TopLeft.x -= toAdd;
-                BotLeft.x -= toAdd;
-                liBotRight.y -= toAdd;
-                liTopRight.y -= toAdd;
-                TopLeft.y -= toAdd;
-                BotLeft.y -= toAdd;
-                break;
-            }
-
-            case 2:
-            {
-                break;
-            }
-
-        }*/
-
-        /*if(FacingLeft)
-        {
-            v_r_fade.push_back(Vertex(Pos.x+1, Pos.y-1,        1, 0, 0, Col)); //top left // x = Cur; y = Cur
-	        v_r_fade.push_back(Vertex(Pos.x-1, Pos.y+1,               1, 1, 0, Col)); //top right  //  x = Cur; y = CurrentPos;
-		    v_r_fade.push_back(Vertex(LastPos.x-1,LastPos.y+1,               1, 1, 1, Col)); //bot right // x = cur ; y = cur
-		    v_r_fade.push_back(Vertex(LastPos.x+1, LastPos.y-1,        1, 0, 1, Col)); //bot left //x =last ; y = last
-        }*/
-       /* v_r_fade.push_back(Vertex(Pos.x-1, Pos.y+1,        1, 0, 0, Col)); //top left // x = Cur; y = Cur
-	    v_r_fade.push_back(Vertex(Pos.x+1, Pos.y-1,               1, 1, 0, Col)); //top right  //  x = Cur; y = CurrentPos;
-		v_r_fade.push_back(Vertex(LastPos.x+1,LastPos.y-1,               1, 1, 1, Col)); //bot right // x = cur ; y = cur
-		v_r_fade.push_back(Vertex(LastPos.x-1, LastPos.y+1,        1, 0, 1, Col)); //bot left //x =last ; y = last*/
-        v_r_fade.push_back(Vertex(liTopRight.x, liTopRight.y,     1, 1, 0, Col)); //top right
-        v_r_fade.push_back(Vertex(TopLeft.x, TopLeft.y,        1, 0, 0, Col)); //top left
-		v_r_fade.push_back(Vertex(BotLeft.x, BotLeft.y,       1, 0, 1, Col)); //bot left
-        v_r_fade.push_back(Vertex(liBotRight.x, liBotRight.y,      1, 1, 1, Col)); //bot right
-        //print(Alpha + " a");
+        v_r_fade.push_back(Vertex(TopLeft.x, liTopLeft.y,     1, 1, 0, Col)); //top right
+        v_r_fade.push_back(Vertex(TopRight.x, liTopRight.y,        1, 0, 0, Col)); //top left
+		v_r_fade.push_back(Vertex(BotRight.x, liBotRight.y,       1, 0, 1, Col)); //bot left
+        v_r_fade.push_back(Vertex(BotLeft.x, liBotLeft.y,      1, 1, 1, Col)); //bot right
+        
+        //v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
+		//v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
+		//v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     1, 1, 1, SColor(255,255,255,255))); //bot right
+		//v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      1, 0, 1, SColor(255,255,255,255))); //bot left
     }
 }
 
@@ -109,6 +73,8 @@ class BulletObj
     Vec2f CurrentPos;
     Vec2f liTopRight;
     Vec2f liBotRight;
+    Vec2f liTopLeft;
+    Vec2f liBotLeft;
     Vec2f BulletGrav;
     Vec2f RenderPos;
     Vec2f LastPos;
@@ -126,7 +92,7 @@ class BulletObj
     string ObjectHitSound;
 
     s8 TimeLeft;
-    
+
     bool FacingLeft;
     
 	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle )
@@ -292,11 +258,11 @@ class BulletObj
         TopLeft.RotateBy( -angle,newPos);
         TopRight.RotateBy(-angle,newPos);
 
-        //BulletGrouped.addFade(TopLeft, BotLeft, liTopRight, liBotRight,bulletRnum);
-        //print(liTopRight + " | " + liBotRight + " a");
-        //liTopRight = TopRight;
-        //liBotRight = BotRight;
-        //print(liTopRight + " | " + liBotRight + " b");
+        BulletGrouped.addFade(TopLeft, BotLeft, TopRight, BotRight, liTopLeft, liBotLeft, liTopRight, liBotRight);
+        liTopRight = TopRight;
+        liBotRight = BotRight;
+        liTopLeft  = TopLeft;
+        liBotLeft  = BotLeft;
 
         v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
 		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
@@ -342,9 +308,9 @@ class BulletHolder
         }*/
     }
 
-    void addFade(Vec2f topLeft, Vec2f botLeft, Vec2f LiTopRight, Vec2f LiBotRight, u8 bulletRnum)
+    void addFade(Vec2f topLeft, Vec2f botLeft, Vec2f topRight, Vec2f botRight, Vec2f liTopLeft, Vec2f liBotLeft, Vec2f liTopRight, Vec2f liBotRight)
     {
-        BulletFade@ fadeToAdd = BulletFade(topLeft,botLeft,LiTopRight,LiBotRight, bulletRnum);
+        BulletFade@ fadeToAdd = BulletFade(topLeft,botLeft,topRight,botRight,liTopLeft,liBotLeft,liTopRight,liBotRight);
         fade.push_back(fadeToAdd);
         fadeToAdd.JoinQueue();
     }
@@ -399,13 +365,15 @@ void onInit(CRules@ this)
 {
 	Reset(this);
     this.addCommandID("fireGun");
+    Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
+    Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
 }
 
 void Reset(CRules@ this)
 {
 	BulletGrouped.Clean();
-	Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
-    Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
+    v_r_fade.clear();
+
 }
 
 void onTick(CRules@ this)
@@ -423,13 +391,19 @@ void SeeMeFlyyyy(int id)//New onRender
 void ok(CMap@ map,CRules@ rules)
 {
 
-    v_r_bullet.clear();
     //v_r_fade.clear();
     Render::SetAlphaBlend(true);
     BulletGrouped.FillArray();
     if(v_r_bullet.length() > 0)
     {
         Render::RawQuads("Bullet.png", v_r_bullet);
+        v_r_bullet.clear();
+    }
+
+    if(v_r_fade.length() > 0)
+    {
+        Render::RawQuads("Bullet.png", v_r_fade);
+        v_r_fade.clear();
     }
 
 }
