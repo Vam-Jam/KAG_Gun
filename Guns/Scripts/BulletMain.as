@@ -3,43 +3,24 @@
 
 class BulletFade//todo trail effect
 {
-    Vec2f Pos;
-    Vec2f LastPos;
-    SColor Col;
-    u8 TimeLeft;
-    bool FacingLeft;
-    u8 Alpha;
+    SColor Col = SColor(255,255,255,255);
+
     Vec2f TopLeft;
     Vec2f BotLeft;
     Vec2f TopRight;
     Vec2f BotRight;
-    Vec2f liTopLeft;
-    Vec2f liBotLeft;
-    Vec2f liTopRight;
-    Vec2f liBotRight;
-    BulletFade(Vec2f topLeft, Vec2f botLeft, Vec2f topRight, Vec2f botRight, Vec2f LiTopLeft, Vec2f LiBotLeft, Vec2f LiTopRight, Vec2f LiBotRight)
-    {
-        //print("hello world");
-        //Pos = CurrentPos;
-        //LastPos = lastPos;
-        TimeLeft = 20 / (60 * getRenderDeltaTime());
-        //print(TimeLeft + " a");
-        Alpha = 150;
-        Col = SColor(255, 255, 174, 61);
-        TopLeft = topLeft;
-        BotLeft = botLeft;
-        TopRight = topRight;
-        BotRight = botRight;
-        liTopLeft = LiTopLeft;
-        liBotLeft = LiBotLeft;
-        liTopRight = LiTopRight;
-        liBotRight = LiBotRight;
 
+    BulletFade(Vec2f CurrentPos)
+    {
+        TopLeft = CurrentPos;
+        BotLeft = CurrentPos;
+        TopRight = CurrentPos;
+        BotRight = CurrentPos;
     }
 
-    void JoinQueue()
+    void JoinQueue(Vec2f FrontLeft, Vec2f FrontRight)
     {
-        TimeLeft -=1;
+        /*TimeLeft -=1;
         if(Alpha < 5)
         {
             TimeLeft = 0;
@@ -50,12 +31,20 @@ class BulletFade//todo trail effect
         Col.setBlue(Col.getBlue() + 1);
         Col.setGreen(Col.getGreen() - 1);
         Col.setAlpha(Alpha);
-        float toAdd = 0.20 * ((60 * getRenderDeltaTime()));
+        float toAdd = 0.20 * ((60 * getRenderDeltaTime()));*/
 
-        v_r_fade.push_back(Vertex(TopLeft.x, liTopLeft.y,     1, 1, 0, Col)); //top right
-        v_r_fade.push_back(Vertex(TopRight.x, liTopRight.y,        1, 0, 0, Col)); //top left
-		v_r_fade.push_back(Vertex(BotRight.x, liBotRight.y,       1, 0, 1, Col)); //bot left
-        v_r_fade.push_back(Vertex(BotLeft.x, liBotLeft.y,      1, 1, 1, Col)); //bot right
+
+        v_r_fade.push_back(Vertex(FrontLeft.x - 0.7, FrontLeft.y + 0.7,     1, 1, 0, Col)); //top right
+        v_r_fade.push_back(Vertex(FrontRight.x - 0.7, FrontRight.y - 0.7,        1, 0, 0, Col)); //top left
+		v_r_fade.push_back(Vertex(BotRight.x + 0.7, BotRight.y + 0.7,       1, 0, 1, Col)); //bot left
+        v_r_fade.push_back(Vertex(BotLeft.x+ 0.7, BotLeft.y - 0.7,      1, 1, 1, Col)); //bot right
+
+        
+        //Vec2f TopLeft  = Vec2f(newPos.x -0.7, newPos.y-3);
+        //Vec2f TopRight = Vec2f(newPos.x -0.7, newPos.y+3);
+        //Vec2f BotLeft  = Vec2f(newPos.x +0.7, newPos.y-3);
+        //Vec2f BotRight = Vec2f(newPos.x +0.7, newPos.y+3);
+        
         
         //v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
 		//v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
@@ -68,6 +57,8 @@ class BulletObj
 {
     CBlob@ hoomanShooter;
     CBlob@ gunBlob;
+
+    BulletFade@ Fade;
 
     Vec2f TrueVelocity;
     Vec2f CurrentPos;
@@ -105,17 +96,16 @@ class BulletObj
         TimeLeft = gun.get_u8("TTL");
         KB       = gun.get_Vec2f("KB");
         Speed    = gun.get_u8("speed");
-        FleshHitSound = gun.get_string("flesh_hit_sound");
-        ObjectHitSound= gun.get_string("object_hit_sound");
+        FleshHitSound  = gun.get_string("flesh_hit_sound");
+        ObjectHitSound = gun.get_string("object_hit_sound");
         @hoomanShooter = humanBlob;
         StartingAimPos = angle;
         LastPos    = CurrentPos;
 		RenderPos  = CurrentPos;
-        liTopRight = CurrentPos;
-        liBotRight = CurrentPos;
 
         @gunBlob   = gun;
         lastDelta = 0;
+        @Fade = BulletGrouped.addFade(CurrentPos);
 	}
 
 
@@ -127,7 +117,7 @@ class BulletObj
 
     void onFakeTick(CMap@ map)
     {
-        map.debugRaycasts = true;
+        //map.debugRaycasts = true;
         //Render stuff
         lastDelta = 0;
         LastPos = CurrentPos;
@@ -136,7 +126,7 @@ class BulletObj
         f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
-        CurrentPos = (((dir * Speed) - (Gravity * Speed))) + CurrentPos;
+        CurrentPos = ((dir * Speed) - (Gravity * Speed)) + CurrentPos;
         TrueVelocity = CurrentPos - LastPos;
         //End
 
@@ -235,6 +225,11 @@ class BulletObj
         {
             TimeLeft = 0;
         }
+
+        //Fade
+        Fade.BotLeft = CurrentPos;
+        Fade.BotRight = CurrentPos; 
+        //End
     }
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
@@ -258,11 +253,15 @@ class BulletObj
         TopLeft.RotateBy( -angle,newPos);
         TopRight.RotateBy(-angle,newPos);
 
-        BulletGrouped.addFade(TopLeft, BotLeft, TopRight, BotRight, liTopLeft, liBotLeft, liTopRight, liBotRight);
-        liTopRight = TopRight;
-        liBotRight = BotRight;
-        liTopLeft  = TopLeft;
-        liBotLeft  = BotLeft;
+        if(FacingLeft)
+        {
+            Fade.JoinQueue(TopLeft,TopRight);
+        }
+        else
+        {
+            //Fade.JoinQueue(newPos,BotRight);
+        }
+
 
         v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
 		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
@@ -296,23 +295,13 @@ class BulletHolder
                 bullets[a].onFakeTick(map);
             }
         }
-
-        /*or(int a = 0; a < fade.length(); a++)
-        {
-            if(fade[a].TimeLeft < 1)
-            {
-                fade.removeAt(a);
-                continue;
-            }
-            fade[a].TimeLeft -= 1;
-        }*/
     }
 
-    void addFade(Vec2f topLeft, Vec2f botLeft, Vec2f topRight, Vec2f botRight, Vec2f liTopLeft, Vec2f liBotLeft, Vec2f liTopRight, Vec2f liBotRight)
+    BulletFade addFade(Vec2f spawnPos)
     {
-        BulletFade@ fadeToAdd = BulletFade(topLeft,botLeft,topRight,botRight,liTopLeft,liBotLeft,liTopRight,liBotRight);
+        BulletFade@ fadeToAdd = BulletFade(spawnPos);
         fade.push_back(fadeToAdd);
-        fadeToAdd.JoinQueue();
+        return fadeToAdd; 
     }
     
     void FillArray()
@@ -322,15 +311,15 @@ class BulletHolder
             bullets[a].JoinQueue();
         }
 
-        for(int a = 0; a < fade.length(); a++)
+        /*for(int a = 0; a < fade.length(); a++)
         {
             if(fade[a].TimeLeft < 1)
             {
                 fade.removeAt(a);
                 continue;
             }
-            fade[a].JoinQueue();
-        }
+            //fade[a].JoinQueue();
+        }*/
     }
 
     void AddNewObj(BulletObj@ this)
@@ -373,7 +362,6 @@ void Reset(CRules@ this)
 {
 	BulletGrouped.Clean();
     v_r_fade.clear();
-
 }
 
 void onTick(CRules@ this)
@@ -402,7 +390,7 @@ void ok(CMap@ map,CRules@ rules)
 
     if(v_r_fade.length() > 0)
     {
-        Render::RawQuads("Bullet.png", v_r_fade);
+        Render::RawQuads("fade.png", v_r_fade);
         v_r_fade.clear();
     }
 
