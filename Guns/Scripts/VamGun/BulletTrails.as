@@ -34,10 +34,10 @@ class BulletFade//todo trail effect
         float toAdd = 0.20 * ((60 * getRenderDeltaTime()));*/
 
 
-        v_r_fade.push_back(Vertex(FrontLeft.x - 0.7, FrontLeft.y + 0.7,     1, 1, 0, Col)); //top right
+        /*v_r_fade.push_back(Vertex(FrontLeft.x - 0.7, FrontLeft.y + 0.7,     1, 1, 0, Col)); //top right
         v_r_fade.push_back(Vertex(FrontRight.x - 0.7, FrontRight.y - 0.7,        1, 0, 0, Col)); //top left
 		v_r_fade.push_back(Vertex(BotRight.x + 0.7, BotRight.y + 0.7,       1, 0, 1, Col)); //bot left
-        v_r_fade.push_back(Vertex(BotLeft.x+ 0.7, BotLeft.y - 0.7,      1, 1, 1, Col)); //bot right
+        v_r_fade.push_back(Vertex(BotLeft.x+ 0.7, BotLeft.y - 0.7,      1, 1, 1, Col)); //bot right*/
 
         
         //Vec2f TopLeft  = Vec2f(newPos.x -0.7, newPos.y-3);
