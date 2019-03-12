@@ -6,6 +6,7 @@ void shoot(CBlob@ this, const f32 aimangle, CBlob@ holder)
 	params.write_netid(holder.getNetworkID());
 	params.write_netid(this.getNetworkID());
 	params.write_f32(aimangle);
+	params.write_Vec2f(holder.getPosition());
 	rules.SendCommand(rules.getCommandID("fireGun"), params);
 }
 

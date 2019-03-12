@@ -116,6 +116,7 @@ void onTick(CBlob@ this)
 							{
 								aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
 								shoot(this, aimangle, holder);
+								
 								aimangle = tempAngle;
 								this.sub_u8("clip",1);
 							}

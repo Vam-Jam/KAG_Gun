@@ -86,9 +86,9 @@ class BulletObj
 
     bool FacingLeft;
     
-	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle )
+	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle, Vec2f pos)
 	{
-        CurrentPos = humanBlob.getPosition();
+        CurrentPos = pos;
         FacingLeft = humanBlob.isFacingLeft();
         BulletGrav = gun.get_Vec2f("grav");
         Damage   = gun.get_f32("damage");
@@ -503,7 +503,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
         if(hoomanBlob !is null && gunBlob !is null)
         {  
             f32 angle = params.read_f32();
-            BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle));
+            Vec2f pos = params.read_Vec2f();
+            BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
         }
     }
 }
