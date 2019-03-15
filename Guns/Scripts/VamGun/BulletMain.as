@@ -8,11 +8,14 @@ Vertex[] v_r_fade;
 Vertex[] v_r_reloadBox;
 SColor white = SColor(255,255,255,255);
 SColor eatUrGreens = SColor(255,0,255,0);
+int FireGunID;
+int FireShotgunID;
 
 void onInit(CRules@ this)
 {
 	Reset(this);
-    this.addCommandID("fireGun");
+    FireGunID     = this.addCommandID("fireGun");
+    FireShotgunID = this.addCommandID("fireShotgun");
     Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
     Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
 }
@@ -157,17 +160,61 @@ void renderScreenpls()//GUI
     }
 }
 
+Random@ r = Random();
+
 void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
-	if(cmd == this.getCommandID("fireGun"))
+	if(cmd == FireGunID)
     {
         CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());
         CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
 
         if(hoomanBlob !is null && gunBlob !is null)
         {  
-            f32 angle = params.read_f32();
-            Vec2f pos = params.read_Vec2f();
+            const f32 angle = params.read_f32();
+            const Vec2f pos = params.read_Vec2f();
             BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
         }
+    }
+    else if(cmd == FireShotgunID)
+    {
+        CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());  
+        CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
+
+        if(hoomanBlob !is null && gunBlob !is null)
+        {  
+            const f32 angle  = params.read_f32();
+            const Vec2f pos  = params.read_Vec2f();
+	        const u8 spread  = gunBlob.get_u8("spread");
+            const u8 b_count = gunBlob.get_u8("b_count");
+            const bool sFLB  = gunBlob.get_bool("sFLB");
+            if(sFLB)
+            {
+                f32 tempAngle = angle;
+
+                for(u8 a = 0; a < b_count; a++)
+                {
+                    tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
+                    print(tempAngle + "");
+                    BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
+                }
+            }
+            else
+            {
+                for(u8 a = 0; a < b_count; a++)
+                {
+                    f32 tempAngle = angle;
+                    tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
+                    BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
+                }
+            }
+            
+        }
+
+        /*f32 tempAngle = aimangle;
+        for(uint8 a = 0; a < BUL_PER_SHOT; a++)
+        {
+            aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
+            shoot(this, aimangle, holder);
+        }*/
     }
 }

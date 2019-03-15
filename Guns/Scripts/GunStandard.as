@@ -1,14 +1,27 @@
-void shoot(CBlob@ this, const f32 aimangle, CBlob@ holder) 
+void shootGun(const u16 gunID, const f32 aimangle, const u16 hoomanID, const Vec2f pos) 
 {
 	CRules@ rules = getRules();
 	CBitStream params;
 
-	params.write_netid(holder.getNetworkID());
-	params.write_netid(this.getNetworkID());
+	params.write_netid(hoomanID);
+	params.write_netid(gunID);
 	params.write_f32(aimangle);
-	params.write_Vec2f(holder.getPosition());
+	params.write_Vec2f(pos);
 	rules.SendCommand(rules.getCommandID("fireGun"), params);
 }
+
+void shootShotgun(const u16 gunID, const f32 aimangle, const u16 hoomanID, const Vec2f pos) 
+{
+	CRules@ rules = getRules();
+	CBitStream params;
+
+	params.write_netid(hoomanID);
+	params.write_netid(gunID);
+	params.write_f32(aimangle);
+	params.write_Vec2f(pos);
+	rules.SendCommand(rules.getCommandID("fireShotgun"), params);
+}
+
 
 void reload(CBlob@ this, CBlob@ holder) 
 {

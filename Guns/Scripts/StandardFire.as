@@ -21,6 +21,9 @@ void onInit(CBlob@ this)
 	this.set_u8("TTL"          ,B_TTL);
 	this.set_Vec2f("KB"        ,B_KB);
 	this.set_Vec2f("grav"      ,B_GRAV);
+	this.set_u8("spread"       ,B_SPREAD);
+	this.set_bool("sFLB"       ,S_LAST_B);
+	this.set_u8("b_count"      ,BUL_PER_SHOT);
 	this.set_u8("speed"        ,B_SPEED);
 	this.set_f32("damage"      ,B_DAMAGE);
 	this.set_u16("coins_flesh" ,B_F_COINS);
@@ -55,9 +58,6 @@ void onTick(CBlob@ this)
 			f32 aimangle = getAimAngle(this,holder);
 
 	        // rotate towards mouse cursor
-	        sprite.ResetTransform();
-	        sprite.RotateBy( aimangle, holder.isFacingLeft() ? Vec2f(-3,3) : Vec2f(3,3) );
-	        sprite.animation.frame = 0;
 
 	        // fire + reload
 	        if(holder.isMyPlayer())	
@@ -108,24 +108,19 @@ void onTick(CBlob@ this)
 					else if(this.get_u8("clip") > 0) 
 					{
 						sprite.PlaySound(FIRE_SOUND);
-						if(BUL_PER_SHOT > 1)
+						actionInterval = FIRE_INTERVAL;
+						if(BUL_PER_SHOT > 0)
 						{
-							actionInterval = FIRE_INTERVAL;
-							f32 tempAngle = aimangle;
-							for(uint8 a = 0; a < BUL_PER_SHOT; a++)
-							{
-								aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
-								shoot(this, aimangle, holder);
-								
-								aimangle = tempAngle;
-								this.sub_u8("clip",1);
-							}
+							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
+							this.sub_u8("clip",BUL_PER_SHOT);
 						}
 						else
 						{
-							aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
-							shoot(this, aimangle, holder);
-							actionInterval = FIRE_INTERVAL;
+							if(B_SPREAD != 0)
+							{
+								aimangle += XORRandom(2) != 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
+							}
+							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
 							this.sub_u8("clip",1);
 						}
 					}
@@ -138,6 +133,10 @@ void onTick(CBlob@ this)
 
 				this.set_u8("actionInterval", actionInterval);	
 			}
+
+			sprite.ResetTransform();
+	        sprite.RotateBy( aimangle, holder.isFacingLeft() ? Vec2f(-3,3) : Vec2f(3,3) );
+	        sprite.animation.frame = 0;
 		}
     } 
     else 

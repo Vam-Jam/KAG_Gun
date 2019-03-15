@@ -19,6 +19,7 @@ const int   B_F_COINS= 2; //Coins on hitting flesh (player or other blobs with '
 const int   B_O_COINS= 1; //Coins on hitting objects (like tanks, boulders etc)
 const int   T_TO_DIE = 1500; //30 * how many seconds before gun disspears if it hasnt been picked up
 const string C_TAG   = "autoRifle"; //Custom TAG, can be used later on ingame for certain ammos etc
+const bool  S_LAST_B = true; //Should we spread from the last bullet shot(true) or from the mouse pos(false), only matters for shotguns
 
 //Sound configs
 const string S_FLESH_HIT = "ArrowHitFlesh.ogg"; //Sound we make when hitting a fleshy object

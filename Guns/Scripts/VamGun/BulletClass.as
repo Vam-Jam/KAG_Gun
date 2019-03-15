@@ -89,6 +89,7 @@ class BulletObj
                 if (hit.blob !is null) // blob
                 {   
                     CBlob@ blob = @hit.blob;
+                    //TODO switch case with name
                     if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
                     {
                         if(blob.isCollidable())
