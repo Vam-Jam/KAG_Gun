@@ -1,6 +1,7 @@
 #include "GunStandard.as";
 
 const uint8 NO_AMMO_INTERVAL = 35;
+u8 reloadCMD;
 
 void onInit(CBlob@ this) 
 {
@@ -10,8 +11,7 @@ void onInit(CBlob@ this)
         ap.SetKeysToTake(key_action1);
     }
 
-    this.addCommandID("shoot");
-    this.addCommandID("reload");
+    reloadCMD = this.addCommandID("reload");
 
     this.set_u8("clip", CLIP);
     this.set_u8("total", TOTAL);

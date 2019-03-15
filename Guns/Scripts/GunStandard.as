@@ -34,7 +34,7 @@ void reload(CBlob@ this, CBlob@ holder)
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params) 
 {
 	CSprite@ sprite = this.getSprite();
-	if(cmd == this.getCommandID("reload")) 
+	if(cmd == reloadCMD) 
 	{
 		int currentTotalAmount = this.get_u8("total");
 		int currentClipAmount = this.get_u8("clip");
