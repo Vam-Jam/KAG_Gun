@@ -109,7 +109,7 @@ void onTick(CBlob@ this)
 					{
 						sprite.PlaySound(FIRE_SOUND);
 						actionInterval = FIRE_INTERVAL;
-						if(BUL_PER_SHOT > 0)
+						if(BUL_PER_SHOT > 1)
 						{
 							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
 							this.sub_u8("clip",BUL_PER_SHOT);

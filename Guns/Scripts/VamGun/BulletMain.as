@@ -194,7 +194,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                 for(u8 a = 0; a < b_count; a++)
                 {
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
-                    print(tempAngle + "");
+                    //print(tempAngle + "");
                     BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
                 }
             }
