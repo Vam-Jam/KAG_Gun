@@ -187,6 +187,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 	        const u8 spread  = gunBlob.get_u8("spread");
             const u8 b_count = gunBlob.get_u8("b_count");
             const bool sFLB  = gunBlob.get_bool("sFLB");
+
             if(sFLB)
             {
                 f32 tempAngle = angle;

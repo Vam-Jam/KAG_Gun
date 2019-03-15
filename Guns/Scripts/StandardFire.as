@@ -52,12 +52,7 @@ void onTick(CBlob@ this)
 	        CSprite@ sprite = this.getSprite();
 	        
 			Vec2f aimvector = holder.getAimPos() - this.getPosition();
-			
- 			//f32 aimangle = 0 - aimvector.Angle() + (this.isFacingLeft() == true ? 180.0f : 0);
-			//const f32 aimangle = getAimAngle(this,holder);
 			f32 aimangle = getAimAngle(this,holder);
-
-	        // rotate towards mouse cursor
 
 	        // fire + reload
 	        if(holder.isMyPlayer())	
@@ -109,6 +104,14 @@ void onTick(CBlob@ this)
 					{
 						sprite.PlaySound(FIRE_SOUND);
 						actionInterval = FIRE_INTERVAL;
+						if(G_RECOIL > 0)
+						{
+							CControls@ c = holder.getControls();
+							if(c !is null)
+							{
+								c.setMousePosition(c.getMouseScreenPos() + Vec2f(0,-G_RECOIL));
+							}
+						}
 						if(BUL_PER_SHOT > 1)
 						{
 							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
@@ -133,10 +136,9 @@ void onTick(CBlob@ this)
 
 				this.set_u8("actionInterval", actionInterval);	
 			}
-
 			sprite.ResetTransform();
-	        sprite.RotateBy( aimangle, holder.isFacingLeft() ? Vec2f(-3,3) : Vec2f(3,3) );
-	        sprite.animation.frame = 0;
+			sprite.RotateBy( aimangle, holder.isFacingLeft() ? Vec2f(-3,3) : Vec2f(3,3) );
+
 		}
     } 
     else 
