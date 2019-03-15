@@ -32,7 +32,7 @@ void onTick(CRules@ this)
 
 void Reset(CRules@ this)
 {
-	BulletGrouped.Clean();
+	v_r_bullet.clear();
     v_r_fade.clear();
 }
 
@@ -54,19 +54,19 @@ void ok(CMap@ map,CRules@ rules)//Bullets
 {
 
     //v_r_fade.clear();
-    Render::SetAlphaBlend(true);
-    BulletGrouped.FillArray();
-    if(v_r_bullet.length() > 0)
+    //Render::SetAlphaBlend(true);
+    BulletGrouped.FillArray();//fill up the vortex with what we need
+    if(v_r_bullet.length() > 0)//if we didnt do that no reason
     {
-        Render::RawQuads("Bullet.png", v_r_bullet);
-        v_r_bullet.clear();
+        Render::RawQuads("Bullet.png", v_r_bullet);//r e n d e r my child
+        v_r_bullet.clear();//and we clean all
     }
 
-    if(v_r_fade.length() > 0)
+    /*if(v_r_fade.length() > 0)//same as above but not in use
     {
         Render::RawQuads("fade.png", v_r_fade);
         v_r_fade.clear();
-    }
+    }*/
 
 }
 

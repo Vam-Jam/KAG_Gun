@@ -1,4 +1,6 @@
 //Main classes for bullets
+const SColor trueWhite = SColor(255,255,255,255);
+
 
 class BulletObj
 {
@@ -70,7 +72,7 @@ class BulletObj
         LastPos = CurrentPos;
         TimeLeft--;
         Gravity -= BulletGrav;
-        f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
+        const f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
         CurrentPos = ((dir * Speed) - (Gravity * Speed)) + CurrentPos;
@@ -89,30 +91,7 @@ class BulletObj
                 if (hit.blob !is null) // blob
                 {   
                     CBlob@ blob = @hit.blob;
-                    //TODO switch case with name
-                    if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
-                    {
-                        if(blob.isCollidable())
-                        {
-                            CurrentPos = hitpos;
-                            endBullet = true;
-                            break;
-                        }
-                    }    
-                    else if(blob.getName() == "wooden_platform")
-                    {
-                        /*f32 platform_angle = blob.getAngleDegrees();	
-                        print(platform_angle + " a "+  (((LastPos - CurrentPos).Angle() + 90) % 360 ));
-                        Vec2f direction = Vec2f(0.0f, -1.0f);
-                        direction.RotateBy(platform_angle);
-                        float velocity_angle = direction.AngleWith(Velocity);
-
-                        if(!(velocity_angle > -90.0f && velocity_angle < 90.0f))
-                        {
-                            TimeLeft = 0;
-                        }*/
-                    }          
-                    else if (blob.getTeamNum() != TeamNum)
+                    if (blob.getTeamNum() != TeamNum)
                     {    
                         if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
                         {
@@ -147,8 +126,29 @@ class BulletObj
                             }
                             endBullet = true; 
                         }
-                    
                     }
+                    else if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
+                    {
+                        if(blob.isCollidable())
+                        {
+                            CurrentPos = hitpos;
+                            endBullet = true;
+                            break;
+                        }
+                    }    
+                    else if(blob.getName() == "wooden_platform")
+                    {
+                        /*f32 platform_angle = blob.getAngleDegrees();	
+                        print(platform_angle + " a "+  (((LastPos - CurrentPos).Angle() + 90) % 360 ));
+                        Vec2f direction = Vec2f(0.0f, -1.0f);
+                        direction.RotateBy(platform_angle);
+                        float velocity_angle = direction.AngleWith(Velocity);
+
+                        if(!(velocity_angle > -90.0f && velocity_angle < 90.0f))
+                        {
+                            TimeLeft = 0;
+                        }*/
+                    }          
                 }
                 else
                 { 
@@ -211,10 +211,10 @@ class BulletObj
         }
 
 
-        v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, SColor(255,255,255,255))); //top left
-		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, SColor(255,255,255,255))); //top right
-		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     1, 1, 1, SColor(255,255,255,255))); //bot right
-		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      1, 0, 1, SColor(255,255,255,255))); //bot left
+        v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, trueWhite)); //top left
+		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, trueWhite)); //top right
+		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     1, 1, 1, trueWhite)); //bot right
+		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      1, 0, 1, trueWhite)); //bot left
     }
 
     
