@@ -12,14 +12,14 @@ const int8  B_SPREAD = 0; //the higher the value, the more 'uncontrolable' bulle
 const Vec2f B_GRAV   = Vec2f(0,0.025); //Bullet gravity drop \|/
 const int8  B_SPEED  = 40; //Bullet speed, STRONGLY AFFECTED/EFFECTS B_GRAV
 const int8  B_TTL    = 120; //TTL = Time To Live, bullets will live for 120 ticks before getting destory IF nothing has been hit
-const float B_DAMAGE = 1.7; //1 heart
+const float B_DAMAGE = 1.5; //1 heart
 const Vec2f B_KB     = Vec2f(0,0); //KnockBack velocity on hit
 const int   B_F_COINS= 1; //Coins on hitting flesh (player or other blobs with 'flesh')
 const int   B_O_COINS= 0; //Coins on hitting objects (like tanks, boulders etc)
 const int   T_TO_DIE = 1500; //30 * how many seconds before gun disspears if it hasnt been picked up
 const string C_TAG   = "semiRifle"; //Custom TAG, can be used later on ingame for certain ammos etc
 const bool  S_LAST_B = false; //Should we spread from the last bullet shot(true) or from the mouse pos(false), only matters for shotguns
-const int   G_RECOIL = 0; //0 is default, adds recoil aiming up
+const int   G_RECOIL = 20; //0 is default, adds recoil aiming up
 
 const string S_FLESH_HIT = "ArrowHitFlesh.ogg"; //Sound we make when hitting a fleshy object
 const string S_OBJECT_HIT= "BulletImpact.ogg"; //Sound we make when hitting a wall

@@ -110,6 +110,7 @@ void onTick(CBlob@ this)
 							if(c !is null)
 							{
 								c.setMousePosition(c.getMouseScreenPos() + Vec2f(0,-G_RECOIL));
+								ShakeScreen(Vec2f(0,-G_RECOIL), 150, this.getPosition());
 							}
 						}
 						if(BUL_PER_SHOT > 1)

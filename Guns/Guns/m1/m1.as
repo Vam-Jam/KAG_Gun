@@ -1,8 +1,8 @@
 #include "StandardFire.as";
 
-const uint8 FIRE_INTERVAL = 15; //Used 
-const uint8 CLIP        = 8; //Used
-const uint8 TOTAL       = 80; //Used
+const uint8 FIRE_INTERVAL = 40; //Used 
+const uint8 CLIP        = 5; //Used
+const uint8 TOTAL       = 40; //Used
 const uint8 RELOAD_TIME = 30; //Used, reload timer (in ticks)
 const uint8 BUL_PER_SHOT= 1; //Shots per bullet | CHANGE B_SPREAD, otherwise both bullets will come out together
 
@@ -21,7 +21,7 @@ const int   B_O_COINS= 0; //Coins on hitting objects (like tanks, boulders etc)
 const int   T_TO_DIE = 1500; //30 * how many seconds before gun disspears if it hasnt been picked up
 const string C_TAG   = "semiRifle"; //Custom TAG, can be used later on ingame for certain ammos etc
 const bool  S_LAST_B = false; //Should we spread from the last bullet shot(true) or from the mouse pos(false), only matters for shotguns
-const int   G_RECOIL = 0; //0 is default, adds recoil aiming up
+const int   G_RECOIL = 30; //0 is default, adds recoil aiming up
 
 const string S_FLESH_HIT = "ArrowHitFlesh.ogg"; //Sound we make when hitting a fleshy object
 const string S_OBJECT_HIT= "BulletImpact.ogg"; //Sound we make when hitting a wall
