@@ -95,7 +95,17 @@ class BulletObj
                     CBlob@ blob = @hit.blob;
                     if (blob.getTeamNum() != TeamNum)
                     {    
-                        if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
+                        
+                        if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
+                        {
+                            if(blob.isCollidable())
+                            {
+                                CurrentPos = hitpos;
+                                endBullet = true;
+                                break;
+                            }
+                        }    
+                        else if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
                         {
                             CurrentPos = hitpos;
                             if(!blob.hasTag("invincible") && !blob.hasTag("seated"))
@@ -129,15 +139,6 @@ class BulletObj
                             endBullet = true; 
                         }
                     }
-                    else if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
-                    {
-                        if(blob.isCollidable())
-                        {
-                            CurrentPos = hitpos;
-                            endBullet = true;
-                            break;
-                        }
-                    }    
                     else if(blob.getName() == "wooden_platform")
                     {
                         /*f32 platform_angle = blob.getAngleDegrees();	
