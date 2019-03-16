@@ -175,6 +175,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
             const Vec2f pos = params.read_Vec2f();
             BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
             gunBlob.sub_u8("clip",1);
+            gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
             if(hoomanBlob.isFacingLeft())
             {
                 f32 oAngle = (angle % 360) + 180;

@@ -28,6 +28,7 @@ void onInit(CBlob@ this)
 	this.set_f32("damage"      ,B_DAMAGE);
 	this.set_u16("coins_flesh" ,B_F_COINS);
 	this.set_u16("coins_object",B_O_COINS);
+	this.set_string("sound"    ,FIRE_SOUND);
 	this.Tag(C_TAG);
 
 	this.set_string("flesh_hit_sound" ,S_FLESH_HIT);
@@ -90,7 +91,6 @@ void onTick(CBlob@ this)
 				else if(this.get_bool("doReload")) 
 				{
 					reload(this, holder);
-					sprite.PlaySound(RELOAD_SOUND);
 					this.set_bool("doReload", false);
 				} 
 				else if (point.isKeyPressed(key_action1))
@@ -102,7 +102,6 @@ void onTick(CBlob@ this)
 					}				
 					else if(this.get_u8("clip") > 0) 
 					{
-						sprite.PlaySound(FIRE_SOUND);
 						actionInterval = FIRE_INTERVAL;
 						if(G_RECOIL > 0)
 						{

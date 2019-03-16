@@ -39,6 +39,7 @@ void onCommand(CBlob@ this, u8 cmd, CBitStream @params)
 		int currentTotalAmount = this.get_u8("total");
 		int currentClipAmount = this.get_u8("clip");
 		int neededClipAmount = CLIP - currentClipAmount;
+		sprite.PlaySound(RELOAD_SOUND);
 		
 		if(currentTotalAmount >= neededClipAmount) 
 		{
