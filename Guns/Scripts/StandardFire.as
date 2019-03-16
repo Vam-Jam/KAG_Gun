@@ -116,7 +116,6 @@ void onTick(CBlob@ this)
 						if(BUL_PER_SHOT > 1)
 						{
 							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
-							this.sub_u8("clip",BUL_PER_SHOT);
 						}
 						else
 						{
@@ -125,7 +124,6 @@ void onTick(CBlob@ this)
 								aimangle += XORRandom(2) != 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
 							}
 							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
-							this.sub_u8("clip",1);
 						}
 					}
 					else if(!this.get_bool("beginReload")) 

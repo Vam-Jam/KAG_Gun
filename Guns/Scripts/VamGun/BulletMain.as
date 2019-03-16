@@ -1,6 +1,7 @@
 #include "GunHitters.as";
 #include "BulletTrails.as";
 #include "BulletClass.as";
+#include "BulletCase.as";
 
 BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
@@ -14,8 +15,6 @@ int FireShotgunID;
 void onInit(CRules@ this)
 {
 	Reset(this);
-    FireGunID     = this.addCommandID("fireGun");
-    FireShotgunID = this.addCommandID("fireShotgun");
     Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
     Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
 }
@@ -32,6 +31,8 @@ void onTick(CRules@ this)
 
 void Reset(CRules@ this)
 {
+    FireGunID     = this.addCommandID("fireGun");
+    FireShotgunID = this.addCommandID("fireShotgun");
 	v_r_bullet.clear();
     v_r_fade.clear();
 }
@@ -163,19 +164,29 @@ void renderScreenpls()//GUI
 Random@ r = Random();
 
 void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
-	if(cmd == FireGunID)
+	if(cmd == this.getCommandID("fireGun"))
     {
         CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());
         CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
 
         if(hoomanBlob !is null && gunBlob !is null)
         {  
-            const f32 angle = params.read_f32();
+            f32 angle = params.read_f32();
             const Vec2f pos = params.read_Vec2f();
             BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
+            gunBlob.sub_u8("clip",1);
+            if(hoomanBlob.isFacingLeft())
+            {
+                f32 oAngle = (angle % 360) + 180;
+                ParticleCase2("Case.png",pos,oAngle);
+            }
+            else
+            {
+                ParticleCase2("Case.png",pos,angle);
+            }
         }
     }
-    else if(cmd == FireShotgunID)
+    else if(cmd == this.getCommandID("fireShotgun"))
     {
         CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());  
         CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
@@ -187,7 +198,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 	        const u8 spread  = gunBlob.get_u8("spread");
             const u8 b_count = gunBlob.get_u8("b_count");
             const bool sFLB  = gunBlob.get_bool("sFLB");
-
+            gunBlob.sub_u8("clip",b_count);
             if(sFLB)
             {
                 f32 tempAngle = angle;
@@ -207,6 +218,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
                     BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
                 }
+            }
+
+            if(hoomanBlob.isFacingLeft())
+            {
+                f32 oAngle = (angle % 360) + 180;
+                ParticleCase2("Case.png",pos,oAngle);
+            }
+            else
+            {
+                ParticleCase2("Case.png",pos,angle);
             }
             
         }

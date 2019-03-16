@@ -1,4 +1,6 @@
 //Main classes for bullets
+#include "BulletCase.as";
+
 const SColor trueWhite = SColor(255,255,255,255);
 
 
@@ -159,12 +161,8 @@ class BulletObj
 
                     CurrentPos = hitpos;
                     endBullet = true;
-                    CParticle@ p = ParticlePixel(CurrentPos, getRandomVelocity(-TrueVelocity.Angle(), 3.0f, 40.0f), SColor(255,244, 220, 66),true);
-                    if(p !is null)
-                    {
-                        p.fastcollision = true;
-                        p.bounce = 0.4f;
-                    }
+                    //ParticleFromBullet("Bullet.png",CurrentPos,-TrueVelocity.Angle());
+                    ParticleBullet(CurrentPos, TrueVelocity);
                 }
             }
         }
@@ -175,8 +173,8 @@ class BulletObj
         }
 
         //Fade
-        Fade.BotLeft = CurrentPos;
-        Fade.BotRight = CurrentPos; 
+        //Fade.BotLeft = CurrentPos;
+        //Fade.BotRight = CurrentPos; 
         //End
     }
 
@@ -201,14 +199,14 @@ class BulletObj
         TopLeft.RotateBy( -angle,newPos);
         TopRight.RotateBy(-angle,newPos);
 
-        if(FacingLeft)
+        /*if(FacingLeft)
         {
             Fade.JoinQueue(TopLeft,TopRight);
         }
         else
         {
             //Fade.JoinQueue(newPos,BotRight);
-        }
+        }*/
 
 
         v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, trueWhite)); //top left
