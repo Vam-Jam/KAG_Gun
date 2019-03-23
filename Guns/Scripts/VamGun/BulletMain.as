@@ -1,6 +1,6 @@
 #include "GunHitters.as";
 #include "BulletTrails.as";
-//#include "BulletClass.as";
+#include "BulletClass.as";
 #include "BulletCase.as";
 
 //todo

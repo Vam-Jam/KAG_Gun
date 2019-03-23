@@ -1,5 +1,3 @@
-
-
 //Main classes for bullets
 #include "BulletCase.as";
 
