@@ -1,3 +1,5 @@
+
+
 //Main classes for bullets
 #include "BulletCase.as";
 
@@ -19,6 +21,7 @@ class BulletObj
     Vec2f liBotLeft;
     Vec2f BulletGrav;
     Vec2f RenderPos;
+    Vec2f OldPos;
     Vec2f LastPos;
     Vec2f Gravity;
     Vec2f KB;
@@ -51,6 +54,7 @@ class BulletObj
         ObjectHitSound = gun.get_string("object_hit_sound");
         @hoomanShooter = humanBlob;
         StartingAimPos = angle;
+        OldPos     = CurrentPos;
         LastPos    = CurrentPos;
 		RenderPos  = CurrentPos;
 
@@ -70,21 +74,23 @@ class BulletObj
     {
         //map.debugRaycasts = true;
         //Render stuff
-        lastDelta = 0;
-        LastPos = CurrentPos;
         TimeLeft--;
+        if(TimeLeft == 0){
+            return;
+        }
+        OldPos = CurrentPos;
         Gravity -= BulletGrav;
         const f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
         Vec2f dir = Vec2f((FacingLeft ? -1 : 1), 0.0f).RotateBy(angle);
         Vec2f temp = CurrentPos + Vec2f(1 * (FacingLeft ? -1 : 1), 1);
         CurrentPos = ((dir * Speed) - (Gravity * Speed)) + CurrentPos;
-        TrueVelocity = CurrentPos - LastPos;
+        TrueVelocity = CurrentPos - OldPos;
         //End
 
 
         bool endBullet = false;
         HitInfo@[] list;
-        if(map.getHitInfosFromRay(LastPos, -(CurrentPos - LastPos).Angle(), (LastPos - CurrentPos).Length(), hoomanShooter, @list))
+        if(map.getHitInfosFromRay(OldPos, -(CurrentPos - OldPos).Angle(), (OldPos - CurrentPos).Length(), hoomanShooter, @list))
         {
             for(int a = 0; a < list.length(); a++)
             {
@@ -142,7 +148,7 @@ class BulletObj
                     else if(blob.getName() == "wooden_platform")
                     {
                         /*f32 platform_angle = blob.getAngleDegrees();	
-                        print(platform_angle + " a "+  (((LastPos - CurrentPos).Angle() + 90) % 360 ));
+                        print(platform_angle + " a "+  (((OldPos - CurrentPos).Angle() + 90) % 360 ));
                         Vec2f direction = Vec2f(0.0f, -1.0f);
                         direction.RotateBy(platform_angle);
                         float velocity_angle = direction.AngleWith(Velocity);
@@ -186,7 +192,7 @@ class BulletObj
 
         if(endBullet == true)
         {
-            TimeLeft = 0;
+            TimeLeft = 1;
         }
 
         //Fade
@@ -197,7 +203,12 @@ class BulletObj
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
     {    
-		Vec2f newPos = Vec2f(lerp(LastPos.x, CurrentPos.x, lastDelta), lerp(LastPos.y, CurrentPos.y, lastDelta));
+
+        const f32 x = lerp(LastPos.x, CurrentPos.x, getRenderApproximateCorrectionFactor());//Thanks to goldenGuy for finding this and telling me
+        const f32 y = lerp(LastPos.y, CurrentPos.y,getRenderApproximateCorrectionFactor());
+        Vec2f newPos = Vec2f(x,y);
+        LastPos.x = x;
+        LastPos.y = y;
 
 		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();
 
@@ -228,7 +239,6 @@ class BulletObj
 		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     0, 1, 0,   trueWhite)); //top right
 		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     0, 1, 1, trueWhite)); //bot right
 		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      0, 0, 1, trueWhite)); //bot left
-        lastDelta += 30 * getRenderExactDeltaTime();
     }
 
     
@@ -303,7 +313,7 @@ class BulletHolder
 
 const float lerp(float v0, float v1, float t)
 {
-	//return (1 - t) * v0 + t * v1; //Golden guys version of lerp, worked but led to 'big gaps'
+	//return (1 - t) * v0 + t * v1; //Golden guys version of lerp
     return v0 + t*(v1 - v0); //Vamists version
 }
 
