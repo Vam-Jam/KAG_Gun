@@ -1,7 +1,14 @@
 #include "GunHitters.as";
 #include "BulletTrails.as";
-#include "BulletClass.as";
+//#include "BulletClass.as";
 #include "BulletCase.as";
+
+//todo
+//u
+//v
+//vertex textures for bullets
+//learn it 
+
 
 BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
@@ -120,10 +127,10 @@ void renderScreenpls()//GUI
                         {
                             v_r_reloadBox.clear();
                         }
-                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y,     1, 1, 0, white)); //top right
-                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y,     1, 0, 0, white)); //top left
-                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     1, 0, 1, white)); //bot left
-                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80,     1, 1, 1, white)); //bot right
+                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y,    0, 1, 0, white)); //top right
+                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y,        0, 0, 0, white)); //top left
+                        v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     0, 0, 1, white)); //bot left
+                        v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80, 0, 1, 1, white)); //bot right
                     }
                     Render::SetTransformScreenspace();
                     Render::SetAlphaBlend(true);
@@ -176,6 +183,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
             BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
             gunBlob.sub_u8("clip",1);
             gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
+
             if(hoomanBlob.isFacingLeft())
             {
                 f32 oAngle = (angle % 360) + 180;

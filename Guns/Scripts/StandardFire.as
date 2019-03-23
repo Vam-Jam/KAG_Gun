@@ -109,12 +109,12 @@ void onTick(CBlob@ this)
 							if(c !is null)
 							{
 								c.setMousePosition(c.getMouseScreenPos() + Vec2f(0,-G_RECOIL));
-								ShakeScreen(Vec2f(0,-G_RECOIL), 150, this.getPosition());
+								ShakeScreen(Vec2f(0,-G_RECOIL), 150, sprite.getWorldTranslation());
 							}
 						}
 						if(BUL_PER_SHOT > 1)
 						{
-							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
+							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
 						}
 						else
 						{
@@ -122,7 +122,7 @@ void onTick(CBlob@ this)
 							{
 								aimangle += XORRandom(2) != 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
 							}
-							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),holder.getPosition());
+							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
 						}
 					}
 					else if(!this.get_bool("beginReload")) 
@@ -147,7 +147,7 @@ void onTick(CBlob@ this)
 
 f32 getAimAngle( CBlob@ this, CBlob@ holder )
 {
- 	Vec2f aimvector = holder.getAimPos() - this.getPosition();
+ 	Vec2f aimvector = holder.getAimPos() - this.getPosition();//TODO this is a duplicate
     return holder.isFacingLeft() ? -aimvector.Angle()+180.0f : -aimvector.Angle();
 }
 

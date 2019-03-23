@@ -1,3 +1,5 @@
+
+
 //Main classes for bullets
 #include "BulletCase.as";
 
@@ -105,13 +107,14 @@ class BulletObj
                                 break;
                             }
                         }    
-                        else if(blob.hasTag("vehicle") || blob.hasTag("flesh") && blob.isCollidable())
+                        else if(blob.hasTag("flesh") && blob.isCollidable() || blob.hasTag("vehicle"))
                         {
                             CurrentPos = hitpos;
                             if(!blob.hasTag("invincible") && !blob.hasTag("seated"))
                             {
                                 if(isServer())
                                 {
+                                    CPlayer@ p = hoomanShooter.getPlayer();
                                     int coins = 0;
                                     hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
                                     
@@ -124,7 +127,6 @@ class BulletObj
                                         coins = gunBlob.get_u16("coins_object");
                                     }
 
-                                    CPlayer@ p = hoomanShooter.getPlayer();
                                     if(p !is null)
                                     {
                                         p.server_setCoins(p.getCoins() + coins);
@@ -155,7 +157,23 @@ class BulletObj
                 }
                 else
                 { 
-                    if(isClient())
+                    if(isServer())
+                    {
+                        Tile tile = map.getTile(hitpos);
+                        switch(tile.type)
+                        {
+                            case 196:
+                            case 200:
+                            case 201:
+                            case 202:
+                            case 203:
+                            {
+                                map.server_DestroyTile(hitpos, 1.0f);
+                            }
+                            break;
+                        }
+                    }
+                    else
                     {
                         Sound::Play(ObjectHitSound, hitpos, 1.5f);
                     }
@@ -180,9 +198,7 @@ class BulletObj
     }
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
-    {     
-        lastDelta += 30 * getRenderDeltaTime();
-
+    {    
 		Vec2f newPos = Vec2f(lerp(LastPos.x, CurrentPos.x, lastDelta), lerp(LastPos.y, CurrentPos.y, lastDelta));
 
 		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();
@@ -210,10 +226,11 @@ class BulletObj
         }*/
 
 
-        v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      1, 0, 0, trueWhite)); //top left
-		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     1, 1, 0, trueWhite)); //top right
-		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     1, 1, 1, trueWhite)); //bot right
-		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      1, 0, 1, trueWhite)); //bot left
+        v_r_bullet.push_back(Vertex(TopLeft.x,  TopLeft.y,      0, 0, 0,   trueWhite)); //top left
+		v_r_bullet.push_back(Vertex(TopRight.x, TopRight.y,     0, 1, 0,   trueWhite)); //top right
+		v_r_bullet.push_back(Vertex(BotRight.x, BotRight.y,     0, 1, 1, trueWhite)); //bot right
+		v_r_bullet.push_back(Vertex(BotLeft.x,  BotLeft.y,      0, 0, 1, trueWhite)); //bot left
+        lastDelta += 30 * getRenderExactDeltaTime();
     }
 
     
@@ -286,8 +303,9 @@ class BulletHolder
 }
 
 
-float lerp(float v0, float v1, float t)
+const float lerp(float v0, float v1, float t)
 {
-	return (1 - t) * v0 + t * v1;
+	//return (1 - t) * v0 + t * v1; //Golden guys version of lerp, worked but led to 'big gaps'
+    return v0 + t*(v1 - v0); //Vamists version
 }
 
