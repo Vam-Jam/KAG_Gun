@@ -20,6 +20,7 @@ const int   T_TO_DIE = 1500; //30 * how many seconds before gun disspears if it 
 const string C_TAG   = "autoRifle"; //Custom TAG, can be used later on ingame for certain ammos etc
 const bool  S_LAST_B = false; //Should we spread from the last bullet shot(true) or from the mouse pos(false), only matters for shotguns
 const int   G_RECOIL = 5; //0 is default, adds recoil aiming up
+const int   G_RECOILT= 10; //How long should recoil last, 10 is default, 30 = 1 second (like ticks)
 
 const string S_FLESH_HIT = "ArrowHitFlesh.ogg"; //Sound we make when hitting a fleshy object
 const string S_OBJECT_HIT= "BulletImpact.ogg"; //Sound we make when hitting a wall

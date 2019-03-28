@@ -8,6 +8,10 @@
 //v
 //vertex textures for bullets
 //learn it 
+//
+//
+//
+//on join sync bullet count to the new person for each gun, or existing?
 
 
 BulletHolder@ BulletGrouped = BulletHolder();
@@ -180,7 +184,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
         {  
             f32 angle = params.read_f32();
             const Vec2f pos = params.read_Vec2f();
-            BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,angle,pos));
+            const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,angle,pos);
+            //const int Y = gunBlob.get_u16("recoil");
+            //const int RecoilTime = gunBlob.get_u16("recoilTime");
+            //const Recoil@ recoil = Recoil(hoomanBlob,Vec2f(0,Y),RecoilTime, pos);
+            BulletGrouped.AddNewObj(bullet);
+            //BulletGrouped.AddNewRecoil(recoil);
+
+
+
             gunBlob.sub_u8("clip",1);
             gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
 
@@ -216,7 +228,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                 {
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
                     //print(tempAngle + "");
-                    BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
+                    const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+                    BulletGrouped.AddNewObj(bullet);
                 }
             }
             else
@@ -225,7 +238,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                 {
                     f32 tempAngle = angle;
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
-                    BulletGrouped.AddNewObj(BulletObj(hoomanBlob,gunBlob,tempAngle,pos));
+                    const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+                    BulletGrouped.AddNewObj(bullet);
                 }
             }
 

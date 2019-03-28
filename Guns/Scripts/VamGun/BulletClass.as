@@ -15,10 +15,6 @@ class BulletObj
 
     Vec2f TrueVelocity;
     Vec2f CurrentPos;
-    Vec2f liTopRight;
-    Vec2f liBotRight;
-    Vec2f liTopLeft;
-    Vec2f liBotLeft;
     Vec2f BulletGrav;
     Vec2f RenderPos;
     Vec2f OldPos;
@@ -60,9 +56,8 @@ class BulletObj
 
         @gunBlob   = gun;
         lastDelta = 0;
-        @Fade = BulletGrouped.addFade(CurrentPos);
+        //@Fade = BulletGrouped.addFade(CurrentPos);
 	}
-
 
     void SetStartAimPos(Vec2f aimPos, bool isFacingLeft)
     {
@@ -101,7 +96,6 @@ class BulletObj
                     CBlob@ blob = @hit.blob;
                     if (blob.getTeamNum() != TeamNum)
                     {    
-                        
                         if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
                         {
                             if(blob.isCollidable())
@@ -110,7 +104,16 @@ class BulletObj
                                 endBullet = true;
                                 break;
                             }
-                        }    
+                        }
+                        else if(blob.getName() == "wooden_platform")
+                        {
+                            if(CollidesWithPlatform(blob,TrueVelocity))
+                            {
+                                CurrentPos = hitpos;
+                                endBullet = true;
+                                break;
+                            }
+                        }
                         else if(blob.hasTag("flesh") && blob.isCollidable() || blob.hasTag("vehicle"))
                         {
                             CurrentPos = hitpos;
@@ -144,20 +147,7 @@ class BulletObj
                             }
                             endBullet = true; 
                         }
-                    }
-                    else if(blob.getName() == "wooden_platform")
-                    {
-                        /*f32 platform_angle = blob.getAngleDegrees();	
-                        print(platform_angle + " a "+  (((OldPos - CurrentPos).Angle() + 90) % 360 ));
-                        Vec2f direction = Vec2f(0.0f, -1.0f);
-                        direction.RotateBy(platform_angle);
-                        float velocity_angle = direction.AngleWith(Velocity);
-
-                        if(!(velocity_angle > -90.0f && velocity_angle < 90.0f))
-                        {
-                            TimeLeft = 0;
-                        }*/
-                    }          
+                    }      
                 }
                 else
                 { 
@@ -172,7 +162,7 @@ class BulletObj
                             case 202:
                             case 203:
                             {
-                                map.server_DestroyTile(hitpos, 1.0f);
+                                map.server_DestroyTile(hitpos, Damage);
                             }
                             break;
                         }
@@ -203,7 +193,6 @@ class BulletObj
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
     {    
-
         const f32 x = lerp(LastPos.x, CurrentPos.x, getRenderApproximateCorrectionFactor());//Thanks to goldenGuy for finding this and telling me
         const f32 y = lerp(LastPos.y, CurrentPos.y,getRenderApproximateCorrectionFactor());
         Vec2f newPos = Vec2f(x,y);
@@ -223,7 +212,7 @@ class BulletObj
         BotLeft.RotateBy( -angle,newPos);
         BotRight.RotateBy(-angle,newPos);
         TopLeft.RotateBy( -angle,newPos);
-        TopRight.RotateBy(-angle,newPos);
+        TopRight.RotateBy(-angle,newPos);   
 
         /*if(FacingLeft)
         {
@@ -257,20 +246,38 @@ class BulletHolder
         CMap@ map = getMap();
         for(int a = 0; a < bullets.length(); a++)
         {
-            if(bullets[a].TimeLeft < 1)
+            BulletObj@ bullet = bullets[a];
+            if(bullet.TimeLeft < 1)
             {
                 bullets.removeAt(a);
+                //@bullet = null;//Destory to ensure its cleared
                 continue;
             }
             else
             {
-                bullets[a].onFakeTick(map);
+                bullet.onFakeTick(map);
             }
         }
+
+
+        /*for(int a = 0; a < recoil.length(); a++)    
+        {
+            Recoil@ coil = recoil[a];
+            if(coil.TimeToNormal < 1)
+            {
+                recoil.removeAt(a);
+                continue;
+            }
+            else
+            {
+                coil.onFakeTick();
+            }
+        }*/
+
     }
 
     BulletFade addFade(Vec2f spawnPos)
-    {
+    {   
         BulletFade@ fadeToAdd = BulletFade(spawnPos);
         fade.push_back(fadeToAdd);
         return fadeToAdd; 
@@ -294,10 +301,15 @@ class BulletHolder
         }*/
     }
 
-    void AddNewObj(BulletObj@ this)
+    void AddNewObj(const BulletObj@ this)
     {
         bullets.push_back(this);
     }
+
+    /*void AddNewRecoil(const Recoil@ this)
+    {
+        recoil.push_back(this);
+    }*/
     
 	void Clean()
 	{
@@ -317,3 +329,12 @@ const float lerp(float v0, float v1, float t)
     return v0 + t*(v1 - v0); //Vamists version
 }
 
+const bool CollidesWithPlatform(CBlob@ blob, const Vec2f velocity)//Stolen from rock.as
+{
+	const f32 platform_angle = blob.getAngleDegrees();	
+	Vec2f direction = Vec2f(0.0f, -1.0f);
+	direction.RotateBy(platform_angle);
+	const float velocity_angle = direction.AngleWith(velocity);
+
+	return !(velocity_angle > -90.0f && velocity_angle < 90.0f);
+}

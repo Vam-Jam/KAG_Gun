@@ -29,6 +29,8 @@ void onInit(CBlob@ this)
 	this.set_u16("coins_flesh" ,B_F_COINS);
 	this.set_u16("coins_object",B_O_COINS);
 	this.set_string("sound"    ,FIRE_SOUND);
+	this.set_u16("recoil"      ,((G_RECOIL > 0 ) ? -Maths::Abs(G_RECOIL) : Maths::Abs(G_RECOIL)));
+	this.set_u16("recoilTime"  ,G_RECOILT);
 	this.Tag(C_TAG);
 
 	this.set_string("flesh_hit_sound" ,S_FLESH_HIT);
