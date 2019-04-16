@@ -13,6 +13,11 @@
 //
 //on join sync bullet count to the new person for each gun, or existing?
 
+Random@ r = Random(12345);//amazing
+//used to sync numbers between clients *assuming* they have run it the same amount of times 
+//as everybody else
+//(which they should UNLESS kag breaks with bad deltas or other weird net issues)
+
 
 BulletHolder@ BulletGrouped = BulletHolder();
 Vertex[] v_r_bullet;
@@ -42,6 +47,7 @@ void onTick(CRules@ this)
 
 void Reset(CRules@ this)
 {
+    r.Reset(12345);
     FireGunID     = this.addCommandID("fireGun");
     FireShotgunID = this.addCommandID("fireShotgun");
 	v_r_bullet.clear();
@@ -89,31 +95,32 @@ void renderScreenpls()//GUI
     if(holder !is null) 
     {
         CBlob@ b = holder.getAttachments().getAttachmentPointByName("PICKUP").getOccupied(); 
-        CPlayer@ p = holder.getPlayer(); 
+        CPlayer@ p = holder.getPlayer(); //get player holding this
 
         if(b !is null && p !is null) 
         {
-            if(b.exists("clip"))
+            if(b.exists("clip"))//make sure its a valid gun
             {
                 if(p.isMyPlayer() && b.isAttached())
                 {
                     uint8 clip = b.get_u8("clip");
-                    uint8 total = b.get_u8("total");
+                    uint8 total = b.get_u8("total");//get clip and ammo total for easy access later
                     CControls@ controls = getControls();
-                    Vec2f pos = Vec2f(0,getScreenHeight()-80);
-                    bool render = false;
+                    Vec2f pos = Vec2f(0,getScreenHeight()-80);//controls for screen position
+                    bool render = false;//used to save render time (more fps basically)
 
                     if(controls !is null)
                     {
                         int length = (pos - controls.getMouseScreenPos() - Vec2f(-30,-35)).Length();
+                        //get length for 'fancy' invisiblty when mouse goes near it
 
-                        if(length < 256 && length > 0)
+                        if(length < 256 && length > 0)//are we near it?
                         {
                             white.setAlpha(length);
                             eatUrGreens.setAlpha(length);
                             render = true;
                         }
-                        else
+                        else//check the reverse
                         {
                             length=-length;
                             if(length < 256 && length > 0)
@@ -125,9 +132,9 @@ void renderScreenpls()//GUI
                         }
                     }
                         
-                    if(v_r_reloadBox.length() < 1 || render)
+                    if(v_r_reloadBox.length() < 1 || render)//is it time to render?
                     {
-                        if(render)
+                        if(render)//lets clear only IF we need to
                         {
                             v_r_reloadBox.clear();
                         }
@@ -136,11 +143,11 @@ void renderScreenpls()//GUI
                         v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     0, 0, 1, white)); //bot left
                         v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80, 0, 1, 1, white)); //bot right
                     }
-                    Render::SetTransformScreenspace();
-                    Render::SetAlphaBlend(true);
-                    Render::RawQuads("ammoBorder.png", v_r_reloadBox);
+                    Render::SetTransformScreenspace();//set position for render
+                    Render::SetAlphaBlend(true);//since we are going to be doing the invisiblity thing
+                    Render::RawQuads("ammoBorder.png", v_r_reloadBox);//render!
 
-                    pos = Vec2f(15,getScreenHeight() - 68);
+                    pos = Vec2f(15,getScreenHeight() - 68);//positions for the GUI
                     GUI::DrawText(clip+"/"+total, pos, eatUrGreens);
 
                     pos = Vec2f(15,getScreenHeight() - 58);
@@ -151,7 +158,7 @@ void renderScreenpls()//GUI
                     } 
                     else if(clip == 0 && total > 0 && !b.get_bool("beginReload")) 
                     {
-                        GUI::DrawText("Press R to \nreload!", pos, eatUrGreens);
+                        GUI::DrawText("Press R to \nreload or \nshoot again!", pos, eatUrGreens);
                     } 
                     else if(clip == 0 && total == 0) 
                     {
@@ -162,9 +169,9 @@ void renderScreenpls()//GUI
             }
             else
             {
-                if(v_r_reloadBox.length() > 0)
+                if(v_r_reloadBox.length() > 0)//doesnt run anyway, cant remember why this is here
                 {
-                    v_r_reloadBox.clear();
+                    v_r_reloadBox.clear();//so its best not to remove it
                 }
             }
         }   
@@ -172,10 +179,8 @@ void renderScreenpls()//GUI
     }
 }
 
-Random@ r = Random();
-
 void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
-	if(cmd == this.getCommandID("fireGun"))
+	if(cmd == FireGunID)
     {
         CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());
         CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
@@ -185,13 +190,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
             f32 angle = params.read_f32();
             const Vec2f pos = params.read_Vec2f();
             const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,angle,pos);
-            //const int Y = gunBlob.get_u16("recoil");
-            //const int RecoilTime = gunBlob.get_u16("recoilTime");
-            //const Recoil@ recoil = Recoil(hoomanBlob,Vec2f(0,Y),RecoilTime, pos);
             BulletGrouped.AddNewObj(bullet);
-            //BulletGrouped.AddNewRecoil(recoil);
-
-
 
             gunBlob.sub_u8("clip",1);
             gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
@@ -205,9 +204,26 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
             {
                 ParticleCase2("Case.png",pos,angle);
             }
+
+            if(isClient())
+            {
+                CBlob@ localBlob = getLocalPlayerBlob();
+                if(localBlob != null && localBlob is hoomanBlob)//if we are this blob
+                {//RECOIL TIME
+                    //(CBlob@ blob,Vec2f velocity, u16 TimeToEnd, Vec2f startPos)
+                    //	this.set_u16("recoil"      ,G_RECOIL);
+                    const int recoil = gunBlob.get_s16("recoil");
+                    const bool rx = gunBlob.get_bool("recoil_random_x");
+                    const bool ry = gunBlob.get_bool("recoil_random_y");
+                    const int recoilTime = gunBlob.get_u16("recoilTime");
+                    const int recoilBackTime = gunBlob.get_u16("recoilBackTime");
+                    Recoil@ coil = Recoil(localBlob,recoil,recoilTime,recoilBackTime,rx,ry);
+                    BulletGrouped.NewRecoil(@coil);
+                }
+            }
         }
     }
-    else if(cmd == this.getCommandID("fireShotgun"))
+    else if(cmd == FireShotgunID)
     {
         CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());  
         CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
@@ -251,6 +267,23 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
             else
             {
                 ParticleCase2("Case.png",pos,angle);
+            }
+
+            if(isClient())
+            {
+                CBlob@ localBlob = getLocalPlayerBlob();
+                if(localBlob != null && localBlob is hoomanBlob)//if we are this blob
+                {//RECOIL TIME
+                    //(CBlob@ blob,Vec2f velocity, u16 TimeToEnd, Vec2f startPos)
+                    //	this.set_u16("recoil"      ,G_RECOIL);
+                    const int recoil = gunBlob.get_s16("recoil");
+                    const bool rx = gunBlob.get_bool("recoil_random_x");
+                    const bool ry = gunBlob.get_bool("recoil_random_y");
+                    const int recoilTime = gunBlob.get_u16("recoilTime");
+                    const int recoilBackTime = gunBlob.get_u16("recoilBackTime");
+                    Recoil@ coil = Recoil(localBlob,recoil,recoilTime,recoilBackTime,rx,ry);
+                    BulletGrouped.NewRecoil(@coil);
+                }
             }
             
         }

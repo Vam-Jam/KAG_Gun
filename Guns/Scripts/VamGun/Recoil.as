@@ -5,14 +5,15 @@ class Recoil
 {
     CBlob@ Blob;
     CControls@ BlobControls;
-    Vec2f Velocity;
     u16 TimeToNormal;
+    u16 ReturnTime;
     float xTick;
     float yTick;
-    Vec2f StartPos;
-    Vec2f CurrentPos;
+    bool RX;
+    bool RY;
+    s16 DecayRate;
 
-    Recoil(CBlob@ blob,Vec2f velocity, u16 TimeToEnd, Vec2f startPos)
+    Recoil(CBlob@ blob,s16 velocity, u16 TimeToEnd, u16 returnTime, bool randomX, bool randomY)
     {
         if(blob is null || blob.getControls() is null)
         {
@@ -21,12 +22,13 @@ class Recoil
         @Blob = blob;
         @BlobControls = Blob.getControls();
         //@BlobControls = blob.getControls();
-        StartPos = startPos;
-        Velocity = velocity;
-        TimeToNormal = TimeToEnd;
-
+        RX = randomX;
+        RY = randomY;
+        ReturnTime = returnTime;
+        TimeToNormal = TimeToEnd + returnTime;
+        DecayRate = velocity / TimeToEnd;
         xTick = 0;
-        yTick = velocity.y < 0 ? Maths::Clamp(velocity.y / TimeToEnd, -25, -1) : Maths::Clamp(velocity.y / TimeToEnd, 1, 25);
+        yTick = velocity;
     }
 
 
@@ -42,19 +44,21 @@ class Recoil
             return;
         }
         TimeToNormal--;
-        BlobControls.setMousePosition(BlobControls.getMouseScreenPos() + Vec2f(xTick,yTick));
-        if(Blob is getLocalPlayerBlob())
+        yTick -= DecayRate;
+        if(RX && ReturnTime < TimeToNormal)
         {
-            ShakeScreen(Vec2f(xTick,yTick),150,Blob.getInterpolatedPosition());
+            int rNum = XORRandom(-DecayRate * 2);
+            if(XORRandom(2) == 0){
+                xTick -= rNum;
+            }
+            else {
+                xTick += rNum;
+            }
         }
+        BlobControls.setMousePosition(BlobControls.getMouseScreenPos() + Vec2f(xTick,yTick));
+        ShakeScreen(Vec2f(xTick,yTick),150,Blob.getInterpolatedPosition());
 
     }
-    /*
-
-        c.setMousePosition(c.getMouseScreenPos() + Vec2f(0,-G_RECOIL));
-		ShakeScreen(Vec2f(0,-G_RECOIL), 150, sprite.getWorldTranslation());
-
-    */
 }
 
 

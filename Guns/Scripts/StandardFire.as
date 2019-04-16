@@ -1,7 +1,9 @@
 #include "GunStandard.as";
+#include "Recoil.as";
 
 const uint8 NO_AMMO_INTERVAL = 35;
 u8 reloadCMD;
+ 
 
 void onInit(CBlob@ this) 
 {
@@ -29,8 +31,11 @@ void onInit(CBlob@ this)
 	this.set_u16("coins_flesh" ,B_F_COINS);
 	this.set_u16("coins_object",B_O_COINS);
 	this.set_string("sound"    ,FIRE_SOUND);
-	this.set_u16("recoil"      ,((G_RECOIL > 0 ) ? -Maths::Abs(G_RECOIL) : Maths::Abs(G_RECOIL)));
+	this.set_s16("recoil"      ,G_RECOIL);
+	this.set_bool("recoil_random_x",G_RANDOMX);
+	this.set_bool("recoil_random_y",G_RANDOMY);
 	this.set_u16("recoilTime"  ,G_RECOILT);
+	this.set_u16("recoilBackTime",G_BACK_T);
 	this.Tag(C_TAG);
 
 	this.set_string("flesh_hit_sound" ,S_FLESH_HIT);
@@ -105,7 +110,7 @@ void onTick(CBlob@ this)
 					else if(this.get_u8("clip") > 0) 
 					{
 						actionInterval = FIRE_INTERVAL;
-						if(G_RECOIL > 0)
+						/*if(G_RECOIL > 0)
 						{
 							CControls@ c = holder.getControls();
 							if(c !is null)
@@ -113,7 +118,7 @@ void onTick(CBlob@ this)
 								c.setMousePosition(c.getMouseScreenPos() + Vec2f(0,-G_RECOIL));
 								ShakeScreen(Vec2f(0,-G_RECOIL), 150, sprite.getWorldTranslation());
 							}
-						}
+						}*/
 						if(BUL_PER_SHOT > 1)
 						{
 							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
@@ -127,10 +132,17 @@ void onTick(CBlob@ this)
 							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
 						}
 					}
+					else if(this.get_u8("clip") == 0 && this.get_u8("clickReload") == 1)
+					{
+						actionInterval = RELOAD_TIME;
+						this.set_bool("beginReload", false);
+						this.set_bool("doReload", true);
+					}
 					else if(!this.get_bool("beginReload")) 
 					{
 						sprite.PlaySound("EmptyClip.ogg");
 						actionInterval = NO_AMMO_INTERVAL;
+						this.set_u8("clickReload",1);
 					}
 				}
 

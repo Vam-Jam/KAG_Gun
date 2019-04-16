@@ -2,6 +2,7 @@
 
 //Main classes for bullets
 #include "BulletCase.as";
+#include "Recoil.as";
 
 const SColor trueWhite = SColor(255,255,255,255);
 
@@ -238,7 +239,7 @@ class BulletHolder
 {
     BulletObj[] bullets;
     BulletFade[] fade;
-
+    Recoil@ localRecoil;
 	BulletHolder(){}
 
     void FakeOnTick(CRules@ this)
@@ -259,6 +260,17 @@ class BulletHolder
             }
         }
 
+        if(localRecoil !is null)
+        {
+            if(localRecoil.TimeToNormal < 1)
+            {
+                @localRecoil = null;
+            }
+            else
+            {
+                localRecoil.onFakeTick();
+            }
+        }
 
         /*for(int a = 0; a < recoil.length(); a++)    
         {
@@ -273,6 +285,7 @@ class BulletHolder
                 coil.onFakeTick();
             }
         }*/
+    
 
     }
 
@@ -301,15 +314,15 @@ class BulletHolder
         }*/
     }
 
+    void NewRecoil(Recoil@ this)
+    {
+        @localRecoil = this;
+    }
+
     void AddNewObj(const BulletObj@ this)
     {
         bullets.push_back(this);
     }
-
-    /*void AddNewRecoil(const Recoil@ this)
-    {
-        recoil.push_back(this);
-    }*/
     
 	void Clean()
 	{

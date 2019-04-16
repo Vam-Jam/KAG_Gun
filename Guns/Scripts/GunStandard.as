@@ -29,6 +29,7 @@ void reload(CBlob@ this, CBlob@ holder)
 	params.write_Vec2f(this.getPosition());
 	params.write_netid(holder.getNetworkID());
 	this.SendCommand(this.getCommandID("reload"), params);
+	this.set_u8("clickReload",0);
 }
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params) 
