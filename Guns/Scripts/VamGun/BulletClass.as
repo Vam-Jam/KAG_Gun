@@ -333,10 +333,10 @@ class BulletHolder
         return fadeToAdd; 
     }
 
-    void addNewParticle(CParticle@ p)
+    /*void addNewParticle(CParticle@ p)
     {
         PParticles.push_back(PrettyParticle(p));
-    }
+    }*/
     
     void FillArray()
     {
