@@ -20,6 +20,11 @@ The only bits of data sent to the server (and back to the client) is damage done
 
 So far, the server for wild wasteland has not crashed, fps can drop about 20 frames in intensive gun fights (Pre particle, and gun air animation)
 
+# Can i use it?
+
+Sure, It wasnt just made with Wild wasteland in mind, feel free to redo lazer wars with it, or a new type of mode.
+Please give credit if used. If you find any thing questionable, any problems, or want a new feature, do so in the issues tab.
+
 
 # To do
 - Bullet trails (Particles ((Also included inside, not active)If crimson engine gets fixed) or a new Render:: thing (already included with the mod, not finished)
