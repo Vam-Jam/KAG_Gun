@@ -3,6 +3,7 @@
 //Main classes for bullets
 #include "BulletCase.as";
 #include "Recoil.as";
+#include "BulletParticle.as";
 
 const SColor trueWhite = SColor(255,255,255,255);
 
@@ -264,6 +265,7 @@ class BulletHolder
 {
     BulletObj[] bullets;
     BulletFade[] fade;
+    //PrettyParticle@[] PParticles;
     Recoil@ localRecoil;
 	BulletHolder(){}
 
@@ -284,6 +286,16 @@ class BulletHolder
                 bullet.onFakeTick(map);
             }
         }
+         
+        /*for(int a = 0; a < PParticles.length(); a++)
+        {
+            if(PParticles[a].ttl == 0)
+            {
+                PParticles.removeAt(a);
+                continue;
+            }
+            PParticles[a].FakeTick();
+        }*/
 
         if(localRecoil !is null)
         {
@@ -319,6 +331,11 @@ class BulletHolder
         BulletFade@ fadeToAdd = BulletFade(spawnPos);
         fade.push_back(fadeToAdd);
         return fadeToAdd; 
+    }
+
+    void addNewParticle(CParticle@ p)
+    {
+        PParticles.push_back(PrettyParticle(p));
     }
     
     void FillArray()

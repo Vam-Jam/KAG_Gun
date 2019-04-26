@@ -84,7 +84,11 @@ void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint)
 	this.set_bool("doReload", false);
 	//this.set_u8("actionInterval", 0);
 
-	if(total <= TOTAL / 1.2)
+	if(total == 0)
+	{
+		this.server_SetTimeToDie(1);
+	}
+	else if(total <= TOTAL / 1.2)
 	{
 		this.server_SetTimeToDie(T_TO_DIE);
 	}
