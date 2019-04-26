@@ -22,7 +22,6 @@ class BulletObj
     Vec2f LastPos;
     Vec2f Gravity;
     Vec2f KB;
-
     f32 StartingAimPos;
     f32 lastDelta;
     f32 Damage;
@@ -36,6 +35,8 @@ class BulletObj
     s8 TimeLeft;
 
     bool FacingLeft;
+
+
     
 	BulletObj(CBlob@ humanBlob, CBlob@ gun, f32 angle, Vec2f pos)
 	{
@@ -71,7 +72,7 @@ class BulletObj
         //map.debugRaycasts = true;
         //Render stuff
         TimeLeft--;
-        if(TimeLeft == 0){
+        if(TimeLeft < 3){
             return;
         }
         OldPos = CurrentPos;
@@ -85,70 +86,92 @@ class BulletObj
 
 
         bool endBullet = false;
+        bool breakLoop = false;
         HitInfo@[] list;
         if(map.getHitInfosFromRay(OldPos, -(CurrentPos - OldPos).Angle(), (OldPos - CurrentPos).Length(), hoomanShooter, @list))
         {
             for(int a = 0; a < list.length(); a++)
             {
+                breakLoop = false;
                 HitInfo@ hit = list[a];
                 Vec2f hitpos = hit.hitpos;
                 if (hit.blob !is null) // blob
                 {   
                     CBlob@ blob = @hit.blob;
-                    if (blob.getTeamNum() != TeamNum)
-                    {    
-                        if(blob.getName() == "stone_door" || blob.getName() == "wooden_door" || blob.getName() == "trap_block")  
+                    switch(blob.getName().getHash())
+                    {
+                        case 1296319959://Stone_door
+                        case 213968596://Wooden_door
+                        case 916369496://Trapdoor
+                        case -637068387://steelblock
                         {
                             if(blob.isCollidable())
                             {
                                 CurrentPos = hitpos;
-                                endBullet = true;
-                                break;
+                                breakLoop = true;
+                                Sound::Play(ObjectHitSound, hitpos, 1.5f);
                             }
                         }
-                        else if(blob.getName() == "wooden_platform")
+                        break;
+
+                        case 804095823://platform
                         {
                             if(CollidesWithPlatform(blob,TrueVelocity))
                             {
                                 CurrentPos = hitpos;
-                                endBullet = true;
-                                break;
+                                breakLoop = true;
+                                Sound::Play(ObjectHitSound, hitpos, 1.5f);
                             }
                         }
-                        else if(blob.hasTag("flesh") && blob.isCollidable() || blob.hasTag("vehicle"))
+                        break;
+
+                        default:
                         {
-                            CurrentPos = hitpos;
-                            if(!blob.hasTag("invincible") && !blob.hasTag("seated"))
+                            //print(blob.getName() + '\n'+blob.getName().getHash()); useful for debugging new tiles to hit
+
+                            if(blob.hasTag("flesh") && blob.isCollidable() || blob.hasTag("vehicle"))
                             {
-                                if(isServer())
+                                if(blob.getTeamNum() == TeamNum){
+                                    continue;
+                                }
+                                CurrentPos = hitpos;
+                                if(!blob.hasTag("invincible") && !blob.hasTag("seated")) 
                                 {
-                                    CPlayer@ p = hoomanShooter.getPlayer();
-                                    int coins = 0;
-                                    hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
-                                    
-                                    if(blob.hasTag("flesh"))
+                                    if(isServer())
                                     {
-                                        coins = gunBlob.get_u16("coins_flesh");
+                                        CPlayer@ p = hoomanShooter.getPlayer();
+                                        int coins = 0;
+                                        hoomanShooter.server_Hit(blob, CurrentPos, Vec2f(0, 0), Damage, GunHitters::bullet); 
+                                        
+                                        if(blob.hasTag("flesh"))
+                                        {
+                                            coins = gunBlob.get_u16("coins_flesh");
+                                        }
+                                        else
+                                        {
+                                            coins = gunBlob.get_u16("coins_object");
+                                        }
+
+                                        if(p !is null)
+                                        {
+                                            p.server_setCoins(p.getCoins() + coins);
+                                        }
                                     }
                                     else
                                     {
-                                        coins = gunBlob.get_u16("coins_object");
+                                        Sound::Play(FleshHitSound,  CurrentPos, 1.5f); 
                                     }
 
-                                    if(p !is null)
-                                    {
-                                        p.server_setCoins(p.getCoins() + coins);
-                                    }
                                 }
-                                else
-                                {
-                                    Sound::Play(FleshHitSound,  CurrentPos, 1.5f); 
-                                }
-
+                                breakLoop = true;
                             }
-                            endBullet = true; 
                         }
-                    }      
+                    }
+                    if(breakLoop)//So we can break while inside the switch
+                    {
+                        endBullet = true;
+                        break;
+                    }
                 }
                 else
                 { 
@@ -166,6 +189,7 @@ class BulletObj
                                 map.server_DestroyTile(hitpos, Damage);
                             }
                             break;
+                            
                         }
                     }
                     else
@@ -183,7 +207,7 @@ class BulletObj
 
         if(endBullet == true)
         {
-            TimeLeft = 1;
+            TimeLeft = 3;
         }
 
         //Fade
@@ -194,8 +218,9 @@ class BulletObj
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
     {    
-        const f32 x = lerp(LastPos.x, CurrentPos.x, getRenderApproximateCorrectionFactor());//Thanks to goldenGuy for finding this and telling me
-        const f32 y = lerp(LastPos.y, CurrentPos.y,getRenderApproximateCorrectionFactor());
+        const float blend = 1 - Maths::Pow(0.5f, getRenderApproximateCorrectionFactor());//EEEE
+        const f32 x = lerp(LastPos.x, CurrentPos.x, blend);//Thanks to goldenGuy for finding this and telling me
+        const f32 y = lerp(LastPos.y, CurrentPos.y, blend);
         Vec2f newPos = Vec2f(x,y);
         LastPos.x = x;
         LastPos.y = y;
@@ -339,8 +364,9 @@ class BulletHolder
 const float lerp(float v0, float v1, float t)
 {
 	//return (1 - t) * v0 + t * v1; //Golden guys version of lerp
-    return v0 + t*(v1 - v0); //Vamists version
+    return v0 + t * (v1 - v0); //vams version
 }
+
 
 const bool CollidesWithPlatform(CBlob@ blob, const Vec2f velocity)//Stolen from rock.as
 {
@@ -351,3 +377,4 @@ const bool CollidesWithPlatform(CBlob@ blob, const Vec2f velocity)//Stolen from 
 
 	return !(velocity_angle > -90.0f && velocity_angle < 90.0f);
 }
+
