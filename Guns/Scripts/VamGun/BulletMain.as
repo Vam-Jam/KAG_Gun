@@ -31,7 +31,7 @@ int FireShotgunID;
 void onInit(CRules@ this)
 {
 	Reset(this);
-    Render::addScript(Render::layer_objects, "BulletMain", "SeeMeFlyyyy", 0.0f);
+    Render::addScript(Render::layer_postworld, "BulletMain", "SeeMeFlyyyy", 0.0f);
     Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
 }
 
@@ -77,7 +77,7 @@ void ok(CMap@ map,CRules@ rules)//Bullets
     if(v_r_bullet.length() > 0)//if we didnt do that no reason
     {
         Render::RawQuads("Bullet.png", v_r_bullet);//r e n d e r my child
-        v_r_bullet.clear();//and we clean all
+        //v_r_bullet.clear();//and we clean all
     }
 
     /*if(v_r_fade.length() > 0)//same as above but not in use
@@ -189,7 +189,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
         {  
             f32 angle = params.read_f32();
             const Vec2f pos = params.read_Vec2f();
-            const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,angle,pos);
+            BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,angle,pos);
             BulletGrouped.AddNewObj(bullet);
 
             gunBlob.sub_u8("clip",1);
@@ -220,6 +220,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                     Recoil@ coil = Recoil(localBlob,recoil,recoilTime,recoilBackTime,rx,ry);
                     BulletGrouped.NewRecoil(@coil);
                 }
+                //BulletGrouped.addNewParticle(ParticlePixelUnlimited(newPos,Vec2f(0,0),
+                    //SColor(255,255,100,100),false),0);
             }
         }
     }
@@ -244,7 +246,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                 {
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
                     //print(tempAngle + "");
-                    const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+                    BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
                     BulletGrouped.AddNewObj(bullet);
                 }
             }
@@ -254,7 +256,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
                 {
                     f32 tempAngle = angle;
                     tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
-                    const BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+                    BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
                     BulletGrouped.AddNewObj(bullet);
                 }
             }

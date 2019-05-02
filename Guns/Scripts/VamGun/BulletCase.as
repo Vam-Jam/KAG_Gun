@@ -11,6 +11,8 @@ void ParticleCase2(const string particlePic,const Vec2f pos, const f32 angle)
         p.bounce = 0.25;
         p.freerotation = true;
         p.fastcollision = true;
+        p.lighting = true;
+        p.lighting_delay = 0;
     }
 }
 
@@ -21,6 +23,10 @@ void ParticleBullet(Vec2f CurrentPos, Vec2f Velo)
     {
         p.fastcollision = true;
         p.bounce = 0.4f;
+        p.alivetime = 120;
+        p.lighting = true;
+        p.lighting_delay = 0;
+        p.lighting_force_original_color = true;
     }
 }
 
@@ -33,5 +39,7 @@ void ParticleFromBullet(const string particlePic,const Vec2f pos, const f32 angl
         p.damping = 0.5;
         p.mass = 200;
         p.fastcollision = true;
+        p.lighting_delay = 0;
+        p.lighting_force_original_color = true;
     }
 }

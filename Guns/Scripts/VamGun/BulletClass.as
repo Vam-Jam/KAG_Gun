@@ -6,6 +6,9 @@
 #include "BulletParticle.as";
 
 const SColor trueWhite = SColor(255,255,255,255);
+Driver@ PDriver = getDriver();
+const int ScreenX = getDriver().getScreenWidth();
+const int ScreenY = getDriver().getScreenWidth();
 
 
 class BulletObj
@@ -68,14 +71,22 @@ class BulletObj
         StartingAimPos = isFacingLeft ? -aimvector.Angle()+180.0f : -aimvector.Angle();
     }
 
-    void onFakeTick(CMap@ map)
+    bool onFakeTick(CMap@ map)
     {
         //map.debugRaycasts = true;
-        //Render stuff
+        //Time to live check
         TimeLeft--;
-        if(TimeLeft < 3){
-            return;
+        if(TimeLeft < 3)
+        {
+            if(TimeLeft == 0)
+            {
+                return true;
+            }
+            return false;
         }
+        //End
+
+        //Angle check, some magic stuff
         OldPos = CurrentPos;
         Gravity -= BulletGrav;
         const f32 angle = StartingAimPos * (FacingLeft ? 1 : 1);
@@ -96,10 +107,11 @@ class BulletObj
                 breakLoop = false;
                 HitInfo@ hit = list[a];
                 Vec2f hitpos = hit.hitpos;
-                if (hit.blob !is null) // blob
+                CBlob@ blob = @hit.blob;
+                if (blob !is null) // blob
                 {   
-                    CBlob@ blob = @hit.blob;
-                    switch(blob.getName().getHash())
+                    int hash = blob.getName().getHash();
+                    switch(hash)
                     {
                         case 1296319959://Stone_door
                         case 213968596://Wooden_door
@@ -111,6 +123,17 @@ class BulletObj
                                 CurrentPos = hitpos;
                                 breakLoop = true;
                                 Sound::Play(ObjectHitSound, hitpos, 1.5f);
+                                
+                                if(isServer())
+                                {
+                                    if(hash == 213968596)
+                                    {
+                                        if(XORRandom((10 / Damage) + 2) == 0)
+                                        {
+                                            map.server_DestroyTile(hitpos, Damage);     
+                                        }
+                                    }
+                                }
                             }
                         }
                         break;
@@ -122,6 +145,14 @@ class BulletObj
                                 CurrentPos = hitpos;
                                 breakLoop = true;
                                 Sound::Play(ObjectHitSound, hitpos, 1.5f);
+
+                                if(isServer())
+                                {
+                                    if(XORRandom((10 / Damage) + 1) == 0)
+                                    {
+                                       map.server_DestroyTile(hitpos, Damage);     
+                                    }
+                                }
                             }
                         }
                         break;
@@ -181,13 +212,16 @@ class BulletObj
                         Tile tile = map.getTile(hitpos);
                         switch(tile.type)
                         {
-                            case 196:
+                            case 196://wood
                             case 200:
                             case 201:
                             case 202:
-                            case 203:
+                            case 203://wood
                             {
-                                map.server_DestroyTile(hitpos, Damage);
+                                if(XORRandom((10 / Damage) + 1) == 0)
+                                {
+                                    map.server_DestroyTile(hitpos, Damage);     
+                                }
                             }
                             break;
                             
@@ -210,6 +244,7 @@ class BulletObj
         {
             TimeLeft = 3;
         }
+        return false;
 
         //Fade
         //Fade.BotLeft = CurrentPos;
@@ -218,28 +253,41 @@ class BulletObj
     }
 
     void JoinQueue()//every bullet gets forced to join the queue in onRenders, so we use this to calc to position
-    {    
+    {   
+        //Are we on the screen?
+        const Vec2f xLast = PDriver.getScreenPosFromWorldPos(LastPos);
+        const Vec2f xNew  = PDriver.getScreenPosFromWorldPos(CurrentPos);
+        if(!(xNew.x > 0 && xNew.x < ScreenX))//Is our main position still on screen?
+        {//No, so lets left if we just 'left'
+            if(!(xLast.x > 0 && xLast.x < ScreenX))//Was our last position on screen?
+            {//No
+                return;
+            }
+        }
+
+        //Lerp
         const float blend = 1 - Maths::Pow(0.5f, getRenderApproximateCorrectionFactor());//EEEE
         const f32 x = lerp(LastPos.x, CurrentPos.x, blend);//Thanks to goldenGuy for finding this and telling me
         const f32 y = lerp(LastPos.y, CurrentPos.y, blend);
         Vec2f newPos = Vec2f(x,y);
         LastPos.x = x;
         LastPos.y = y;
+        //End
 
-		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();
+		f32 angle = Vec2f(CurrentPos.x-newPos.x, CurrentPos.y-newPos.y).getAngleDegrees();//Sets the angle
 
 
-        Vec2f TopLeft  = Vec2f(newPos.x -0.7, newPos.y-3);
+        Vec2f TopLeft  = Vec2f(newPos.x -0.7, newPos.y-3);//New positions
         Vec2f TopRight = Vec2f(newPos.x -0.7, newPos.y+3);
         Vec2f BotLeft  = Vec2f(newPos.x +0.7, newPos.y-3);
         Vec2f BotRight = Vec2f(newPos.x +0.7, newPos.y+3);
 
-        angle = (angle % 360) + 90;
+        angle = -((angle % 360) + 90);
 
-        BotLeft.RotateBy( -angle,newPos);
-        BotRight.RotateBy(-angle,newPos);
-        TopLeft.RotateBy( -angle,newPos);
-        TopRight.RotateBy(-angle,newPos);   
+        BotLeft.RotateBy( angle,newPos);
+        BotRight.RotateBy(angle,newPos);
+        TopLeft.RotateBy( angle,newPos);
+        TopRight.RotateBy(angle,newPos);   
 
         /*if(FacingLeft)
         {
@@ -265,7 +313,7 @@ class BulletHolder
 {
     BulletObj[] bullets;
     BulletFade[] fade;
-    //PrettyParticle@[] PParticles;
+    PrettyParticle@[] PParticles;
     Recoil@ localRecoil;
 	BulletHolder(){}
 
@@ -275,19 +323,14 @@ class BulletHolder
         for(int a = 0; a < bullets.length(); a++)
         {
             BulletObj@ bullet = bullets[a];
-            if(bullet.TimeLeft < 1)
+            if(bullet.onFakeTick(map))
             {
                 bullets.removeAt(a);
-                //@bullet = null;//Destory to ensure its cleared
-                continue;
-            }
-            else
-            {
-                bullet.onFakeTick(map);
             }
         }
+        print(bullets.length() + '');
          
-        /*for(int a = 0; a < PParticles.length(); a++)
+        for(int a = 0; a < PParticles.length(); a++)
         {
             if(PParticles[a].ttl == 0)
             {
@@ -295,7 +338,7 @@ class BulletHolder
                 continue;
             }
             PParticles[a].FakeTick();
-        }*/
+        }
 
         if(localRecoil !is null)
         {
@@ -333,10 +376,10 @@ class BulletHolder
         return fadeToAdd; 
     }
 
-    /*void addNewParticle(CParticle@ p)
+    void addNewParticle(CParticle@ p,const u8 type)
     {
-        PParticles.push_back(PrettyParticle(p));
-    }*/
+        PParticles.push_back(PrettyParticle(p,type));
+    }
     
     void FillArray()
     {
@@ -361,8 +404,10 @@ class BulletHolder
         @localRecoil = this;
     }
 
-    void AddNewObj(const BulletObj@ this)
+    void AddNewObj(BulletObj@ this)
     {
+        CMap@ map = getMap();
+        this.onFakeTick(map);
         bullets.push_back(this);
     }
     

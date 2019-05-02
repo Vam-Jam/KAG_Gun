@@ -11,7 +11,7 @@ class PrettyParticle
         }
         switch(pattern)
         {
-            case 0://gun does the ded
+            case 0://muzzle flash
             {
                 p.bounce = 0;
                 p.fastcollision = true;
@@ -27,7 +27,7 @@ class PrettyParticle
                 
 
                 //p.gravity = Vec2f(0,0);
-                ttl = 5;
+                ttl = 20;
                 col = p.colour;
                 @Particle = p;
                 FakeTick();
@@ -48,7 +48,6 @@ class PrettyParticle
     
         if(ttl == 1)
         {
-            //print("died");
             col.setAlpha(0);
             Particle.forcecolor = col;
             ttl--;

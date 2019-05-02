@@ -7,6 +7,10 @@ u8 reloadCMD;
 
 void onInit(CBlob@ this) 
 {
+	if(isClient())
+	{
+		this.getSprite().addSpriteLayer("barrel", "bullet.png", 5, 5,15,2);
+	}
     AttachmentPoint@ ap = this.getAttachments().getAttachmentPointByName("PICKUP");
     if (ap !is null) 
     {
@@ -65,6 +69,7 @@ void onTick(CBlob@ this)
 	        // fire + reload
 	        if(holder.isMyPlayer())	
 	        {
+				print(aimvector + " | " + aimangle);
 	        	//check for clip amount error
 				if(this.get_u8("clip") > CLIP) 
 				{
