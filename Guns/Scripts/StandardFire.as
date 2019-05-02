@@ -7,10 +7,6 @@ u8 reloadCMD;
 
 void onInit(CBlob@ this) 
 {
-	if(isClient())
-	{
-		this.getSprite().addSpriteLayer("barrel", "bullet.png", 5, 5,15,2);
-	}
     AttachmentPoint@ ap = this.getAttachments().getAttachmentPointByName("PICKUP");
     if (ap !is null) 
     {
@@ -69,7 +65,7 @@ void onTick(CBlob@ this)
 	        // fire + reload
 	        if(holder.isMyPlayer())	
 	        {
-				print(aimvector + " | " + aimangle);
+				//print(aimvector + " | " + aimangle);
 	        	//check for clip amount error
 				if(this.get_u8("clip") > CLIP) 
 				{
@@ -115,6 +111,10 @@ void onTick(CBlob@ this)
 					else if(this.get_u8("clip") > 0) 
 					{
 						actionInterval = FIRE_INTERVAL;
+						Vec2f fromBarrel = Vec2f((holder.isFacingLeft() ? -1 : 1),0);
+						fromBarrel = fromBarrel.RotateBy(aimangle);
+						fromBarrel *= 7;
+						//print(fromBarrel + " ");
 						/*if(G_RECOIL > 0)
 						{
 							CControls@ c = holder.getControls();
@@ -126,7 +126,7 @@ void onTick(CBlob@ this)
 						}*/
 						if(BUL_PER_SHOT > 1)
 						{
-							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
+							shootShotgun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation() + fromBarrel);
 						}
 						else
 						{
@@ -134,7 +134,7 @@ void onTick(CBlob@ this)
 							{
 								aimangle += XORRandom(2) != 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
 							}
-							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation());
+							shootGun(this.getNetworkID(), aimangle, holder.getNetworkID(),sprite.getWorldTranslation() + fromBarrel);
 						}
 					}
 					else if(this.get_u8("clip") == 0 && this.get_u8("clickReload") == 1)
@@ -186,7 +186,7 @@ f32 getAimAngle2(CBlob@ this, CBlob@ player)
 
 		if (this.isAttached())
 		{
-			print("hi");
+			//print("hi");
 			if (facing_left) { 
 				aim_vec.x = -aim_vec.x; 
 				angle = (-(aim_vec).getAngle() + 180.0f);

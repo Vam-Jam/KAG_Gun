@@ -328,7 +328,7 @@ class BulletHolder
                 bullets.removeAt(a);
             }
         }
-        print(bullets.length() + '');
+        //print(bullets.length() + '');
          
         for(int a = 0; a < PParticles.length(); a++)
         {

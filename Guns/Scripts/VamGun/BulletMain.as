@@ -77,7 +77,7 @@ void ok(CMap@ map,CRules@ rules)//Bullets
     if(v_r_bullet.length() > 0)//if we didnt do that no reason
     {
         Render::RawQuads("Bullet.png", v_r_bullet);//r e n d e r my child
-        //v_r_bullet.clear();//and we clean all
+        v_r_bullet.clear();//and we clean all
     }
 
     /*if(v_r_fade.length() > 0)//same as above but not in use
