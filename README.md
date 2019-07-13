@@ -29,7 +29,8 @@ Sure, It wasnt just made with Wild wasteland in mind, feel free to redo lazer wa
 Please give credit if used. If you find any thing questionable, any problems, or want a new feature, do so in the issues tab.
 
 # Mods that have used this
-- Rob's warzone is using it.
+- WW2 rework is using it
+- Rob's warzone is using it
 - TC gun rework used it as a template
 - Epsilon 3D mod used this as a template
 
