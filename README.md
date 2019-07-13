@@ -1,6 +1,9 @@
 <h2 align = 'center'><img src="https://i.imgur.com/lQEufyo.png"><br>KAG Gun Rework</h2>
 <p align = 'center'> Currently being developed. Check the gun folder to view current guns</p>
 
+# This mod is no longer being actively developed
+I'll still make sure it works from time to time, but new features wont get added that often. Ping me on discord or create an issue if there is one. 
+
 # Why?
 Previously in kag, to make a bullet, the only 2 ways you could do it was to use a blob, or raycast.<br />
 Raycast is the 'cheap' way to make a bullet, its cheaper then a blob in terms of resources, faster, but with more limitations, like being effected by gravity, speed and so on.
@@ -25,10 +28,16 @@ So far, the server for wild wasteland has not crashed, fps can drop about 20 fra
 Sure, It wasnt just made with Wild wasteland in mind, feel free to redo lazer wars with it, or a new type of mode.
 Please give credit if used. If you find any thing questionable, any problems, or want a new feature, do so in the issues tab.
 
+# Mods that have used this
+- Rob's warzone is using it.
+- TC gun rework used it as a template
+- Epsilon 3D mod used this as a template
 
 # To do
-- Bullet trails (Particles ((Also included inside, not active)If crimson engine gets fixed) or a new Render:: thing (already included with the mod, not finished)
+- Bullet trails (Rob has got a fixed version in his mod)
 - Do another round of optimzation checks
 - Allow for bullet sprites to change
 - Comment out the code to explain what does what
 - QOL check
+
+
