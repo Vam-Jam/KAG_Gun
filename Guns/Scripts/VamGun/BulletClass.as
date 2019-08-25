@@ -325,7 +325,7 @@ class BulletHolder
             BulletObj@ bullet = bullets[a];
             if(bullet.onFakeTick(map))
             {
-                bullets.removeAt(a);
+                bullets.erase(a);
             }
         }
         //print(bullets.length() + '');
@@ -334,7 +334,7 @@ class BulletHolder
         {
             if(PParticles[a].ttl == 0)
             {
-                PParticles.removeAt(a);
+                PParticles.erase(a);
                 continue;
             }
             PParticles[a].FakeTick();
