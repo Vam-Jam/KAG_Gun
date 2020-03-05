@@ -7,16 +7,16 @@ u8 reloadCMD;
 
 void onInit(CBlob@ this) 
 {
-    AttachmentPoint@ ap = this.getAttachments().getAttachmentPointByName("PICKUP");
-    if (ap !is null) 
-    {
-        ap.SetKeysToTake(key_action1);
-    }
+	AttachmentPoint@ ap = this.getAttachments().getAttachmentPointByName("PICKUP");
+	if (ap !is null) 
+	{
+		ap.SetKeysToTake(key_action1);
+	}
 
-    reloadCMD = this.addCommandID("reload");
+	reloadCMD = this.addCommandID("reload");
 
-    this.set_u8("clip", CLIP);
-    this.set_u8("total", TOTAL);
+	this.set_u8("clip", CLIP);
+	this.set_u8("total", TOTAL);
 
 	//Vams new stuff
 	this.set_u8("spread"       ,B_SPREAD);
@@ -50,28 +50,28 @@ void onInit(CBlob@ this)
 
 void onTick(CBlob@ this) 
 {	
-    if (this.isAttached()) 
-    {
+	if (this.isAttached()) 
+	{
 		this.getCurrentScript().runFlags &= ~(Script::tick_not_sleeping); 					   		
 		AttachmentPoint@ point = this.getAttachments().getAttachmentPointByName("PICKUP");	   		
-        CBlob@ holder = point.getOccupied();												   
-        if (holder !is null) 
-        { 
-	        CSprite@ sprite = this.getSprite();
-	        
+		CBlob@ holder = point.getOccupied();												   
+		if (holder !is null) 
+		{ 
+			CSprite@ sprite = this.getSprite();
+			
 			Vec2f aimvector = holder.getAimPos() - this.getPosition();
 			f32 aimangle = getAimAngle(this,holder);
 
-	        // fire + reload
-	        if(holder.isMyPlayer())	
-	        {
+			// fire + reload
+			if(holder.isMyPlayer())	
+			{
 				//print(aimvector + " | " + aimangle);
-	        	//check for clip amount error
+				//check for clip amount error
 				if(this.get_u8("clip") > CLIP) 
 				{
 					this.set_u8("clip", 0);
 				}
-	        	
+				
 				CControls@ controls = holder.getControls();
 
 				if(controls !is null) 
@@ -157,17 +157,17 @@ void onTick(CBlob@ this)
 			sprite.RotateBy( aimangle, holder.isFacingLeft() ? Vec2f(-3,3) : Vec2f(3,3) );
 
 		}
-    } 
-    else 
-    {
+	} 
+	else 
+	{
 		this.getCurrentScript().runFlags |= Script::tick_not_sleeping; 
-    }	
+	}	
 }
 
 f32 getAimAngle( CBlob@ this, CBlob@ holder )
 {
  	Vec2f aimvector = holder.getAimPos() - this.getPosition();//TODO this is a duplicate
-    return holder.isFacingLeft() ? -aimvector.Angle()+180.0f : -aimvector.Angle();
+	return holder.isFacingLeft() ? -aimvector.Angle()+180.0f : -aimvector.Angle();
 }
 
 f32 getAimAngle2(CBlob@ this, CBlob@ player)
@@ -199,7 +199,7 @@ f32 getAimAngle2(CBlob@ this, CBlob@ player)
 		else
 		{
 			if ((!facing_left && aim_vec.x < 0) ||
-			        (facing_left && aim_vec.x > 0))
+					(facing_left && aim_vec.x > 0))
 			{
 				if (aim_vec.x > 0) { aim_vec.x = -aim_vec.x; }
 

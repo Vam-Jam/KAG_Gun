@@ -10,7 +10,6 @@ Driver@ PDriver = getDriver();
 const int ScreenX = getDriver().getScreenWidth();
 const int ScreenY = getDriver().getScreenWidth();
 
-
 class BulletObj
 {
     CBlob@ hoomanShooter;

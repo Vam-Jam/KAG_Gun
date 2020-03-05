@@ -69,18 +69,18 @@ void onAttach(CBlob@ this, CBlob@ attached, AttachmentPoint @attachedPoint)
 
 void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint) 
 {
-    CSprite@ sprite = this.getSprite();
-    sprite.ResetTransform();
-    sprite.animation.frame = 0;
+	CSprite@ sprite = this.getSprite();
+	sprite.ResetTransform();
+	sprite.animation.frame = 0;
 	u8 clip = this.get_u8("clip");
 	u8 total = this.get_u8("total");
 
-    Vec2f aimvector = detached.getAimPos() - this.getPosition();
+	Vec2f aimvector = detached.getAimPos() - this.getPosition();
  	f32 angle = 0 - aimvector.Angle() + (this.isFacingLeft() == true ? 180.0f : 0);
-    this.setAngleDegrees(angle);
+	this.setAngleDegrees(angle);
 
-    //Reset reload and interval
-    this.set_bool("beginReload", false);
+	//Reset reload and interval
+	this.set_bool("beginReload", false);
 	this.set_bool("doReload", false);
 	//this.set_u8("actionInterval", 0);
 
