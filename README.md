@@ -32,10 +32,5 @@ Please give credit if used. If you find any thing questionable, any problems, or
 - TC gun rework used it as a template
 - Epsilon 3D mod used this as a template
 
-# To do
-- Bullet trails (Rob has got a fixed version in his mod)
-- Allow for bullet sprites to change
-- Comment out the code to explain what does what
-- QOL check
 
 
