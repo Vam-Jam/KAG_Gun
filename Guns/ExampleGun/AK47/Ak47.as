@@ -40,9 +40,9 @@ const float B_DAMAGE = 1.0f; // 1.0f = 1 heart
 const Vec2f B_GRAV   = Vec2f(0,0.025); // Bullet gravity drop
 const Vec2f B_KB     = Vec2f(0,0);     // KnockBack velocity on hit
 
-const string C_TAG       = "autoRifle";         // Custom TAG, so you can mark different weapons if needed.
-const string S_FLESH_HIT = "ArrowHitFlesh.ogg"; // Sound we make when hitting a fleshy object
-const string S_OBJECT_HIT= "BulletImpact.ogg";  // Sound we make when hitting a wall
-const string FIRE_SOUND    = "AssaultFire.ogg"; // Sound we make when pulling the trigger
-const string RELOAD_SOUND  = "Reload.ogg";      // Sound we make when we reload
+const string C_TAG         = "autoRifle";         // Custom TAG, so you can mark different weapons if needed.
+const string S_FLESH_HIT   = "ArrowHitFlesh.ogg"; // Sound we make when hitting a fleshy object
+const string S_OBJECT_HIT  = "BulletImpact.ogg";  // Sound we make when hitting a wall
+const string FIRE_SOUND    = "AssaultFire.ogg";   // Sound we make when pulling the trigger
+const string RELOAD_SOUND  = "Reload.ogg";        // Sound we make when we reload
 
