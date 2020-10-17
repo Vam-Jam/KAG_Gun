@@ -35,6 +35,8 @@ SColor white = SColor(255,255,255,255);
 SColor eatUrGreens = SColor(255,0,255,0);
 int FireGunID;
 int FireShotgunID;
+
+f32 FRAME_TIME = 0;
 //
 
 // Set commands, add render:: (only do this once)
@@ -71,11 +73,13 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 // Handles making every bullet go weeee
 void onTick(CRules@ this)
 {
+	FRAME_TIME = 0;
 	BulletGrouped.FakeOnTick(this);
 }
 
 void GunRender(int id)
 {
+	FRAME_TIME += Render::getRenderDeltaTime() * getTicksASecond();  // We are using this because ApproximateCorrectionFactor is lerped
 	RenderingBullets();
 }
 
@@ -90,7 +94,7 @@ void RenderingBullets() // Bullets
 	if (v_r_bullet.length() > 0) // If there are no bullets on our screen, dont render
 	{
 		Render::RawQuads("Bullet.png", v_r_bullet);
-		v_r_bullet.clear();
+		//v_r_bullet.clear();
 	}
 }
 
@@ -207,7 +211,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 			BulletGrouped.AddNewObj(bullet);
 
 			gunBlob.sub_u8("clip",1);
-			
+
 			if (isClient())
 			{
 				gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
