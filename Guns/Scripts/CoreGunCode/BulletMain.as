@@ -94,7 +94,11 @@ void RenderingBullets() // Bullets
 	if (v_r_bullet.length() > 0) // If there are no bullets on our screen, dont render
 	{
 		Render::RawQuads("Bullet.png", v_r_bullet);
-		//v_r_bullet.clear();
+
+		if (g_debug < 0) // useful for lerp testing
+		{
+			v_r_bullet.clear();
+		}
 	}
 }
 
