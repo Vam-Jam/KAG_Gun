@@ -47,7 +47,7 @@ void reload(CBlob@ this, CBlob@ holder)
 
 void onCommand(CBlob@ this, u8 cmd, CBitStream @params) 
 {
-	if (cmd == reloadCMD) 
+	if (cmd == this.getCommandID("reload")) 
 	{
 		int currentTotalAmount = this.get_u8("total");
 		int currentClipAmount = this.get_u8("clip");
@@ -114,7 +114,7 @@ void onDetach(CBlob@ this, CBlob@ detached, AttachmentPoint @detachedPoint)
 
 	if(total == 0)
 	{
-		this.server_Die(1);
+		this.server_Die();
 	}
 	else if(total <= TOTAL / 1.2)
 	{
