@@ -42,6 +42,6 @@ Possibly, reach out to me and we can talk about it.
 - Rob's warzone is using it
 - TC gun rework used it as a template
 - Epsilon 3D mod used this as a template
-- Laws64 CSGO mod is using this
+- Laws65 CSGO mod is using this
 
 
