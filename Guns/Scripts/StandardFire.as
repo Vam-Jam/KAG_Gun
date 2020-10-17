@@ -33,25 +33,24 @@ void onInit(CBlob@ this)
 
 void setGunVars(CBlob@ this)
 {
+	this.set_bool("recoil_random_x",	G_RANDOMX);
+	this.set_bool("recoil_random_y",	G_RANDOMY);
+	this.set_bool("sFLB",				S_LAST_B);
 	this.set_u8("clip", 				CLIP);
 	this.set_u8("total", 				TOTAL);
 	this.set_u8("spread",				B_SPREAD);
 	this.set_u8("TTL",					B_TTL);
-	this.set_Vec2f("KB",				B_KB);
-	this.set_Vec2f("grav",				B_GRAV);
-	this.set_u8("spread",				B_SPREAD);
-	this.set_bool("sFLB",				S_LAST_B);
 	this.set_u8("b_count",				BUL_PER_SHOT);
 	this.set_u8("speed",				B_SPEED);
-	this.set_f32("damage",				B_DAMAGE);
 	this.set_u16("coins_flesh", 		B_F_COINS);
 	this.set_u16("coins_object",		B_O_COINS);
-	this.set_string("sound",			FIRE_SOUND);
-	this.set_s16("recoil",				G_RECOIL);
-	this.set_bool("recoil_random_x",	G_RANDOMX);
-	this.set_bool("recoil_random_y",	G_RANDOMY);
 	this.set_u16("recoilTime",			G_RECOILT);
 	this.set_u16("recoilBackTime",		G_BACK_T);
+	this.set_s16("recoil",				G_RECOIL);
+	this.set_f32("damage",				B_DAMAGE);
+	this.set_Vec2f("KB",				B_KB);
+	this.set_Vec2f("grav",				B_GRAV);
+	this.set_string("sound",			FIRE_SOUND);
 	this.set_string("flesh_hit_sound" ,	S_FLESH_HIT);
 	this.set_string("object_hit_sound",	S_OBJECT_HIT);
 }
