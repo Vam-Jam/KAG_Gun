@@ -1,7 +1,13 @@
-//Bullet trails
-//In progress
+//////////////////////////////////////////////////////
+//
+//  BulletTrails.as - Vamist
+//
+//  Never got round to finishing this
+//  This just added a fade effect behind the bullets 
+//  so it looks a bit better
+//
 
-class BulletFade//todo trail effect
+class BulletFade
 {
 	SColor Col = SColor(255,255,255,255);
 
