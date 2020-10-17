@@ -23,9 +23,9 @@ const u8 CLIP        = 255;  // Clip size
 const u8 TOTAL       = 255;  // Total ammo count
 const u8 RELOAD_TIME = 30;   // How long do we wait in ticks to reload
 const u8 BUL_PER_SHOT= 1;    // Bullets per shot | CHANGE B_SPREAD, otherwise both bullets will come out together
-const u8 B_SPREAD	 = 0;     // The higher the value, the more 'uncontrolable' bullets get | USEFUL FOR BUL_PER_SHOT INCREASE 
-const u8 B_SPEED	 = 35;    // Bullet speed, STRONGLY AFFECTED/EFFECTS B_GRAV FOR NOW
-const u8 B_TTL		 = 120;   // Time To Live, bullets will live for 120 ticks before getting destory IF nothing has been hit
+const u8 B_SPREAD	 = 0;    // The higher the value, the more 'uncontrolable' bullets get | USEFUL FOR BUL_PER_SHOT INCREASE 
+const u8 B_SPEED	 = 35;   // Bullet speed, STRONGLY AFFECTED/EFFECTS B_GRAV FOR NOW
+const u8 B_TTL		 = 120;  // Time To Live, bullets will live for 120 ticks before getting destory IF nothing has been hit
 
 const u16 B_F_COINS= 2;   // Coins on hitting flesh (player or other blobs with 'flesh')
 const u16 B_O_COINS= 1;   // Coins on hitting objects (like tanks, boulders etc)
