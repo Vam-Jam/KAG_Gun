@@ -196,10 +196,18 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 			f32 angle = params.read_f32();
 			const Vec2f pos = params.read_Vec2f();
 			BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,angle,pos);
+			
+			u32 timeSpawnedAt = params.read_u32(); // getGameTime() it spawned at
+			CMap@ map = getMap(); 
+			for (;timeSpawnedAt < getGameTime(); timeSpawnedAt++) // Catch up to everybody else
+			{
+				bullet.onFakeTick(map);
+			}
+
 			BulletGrouped.AddNewObj(bullet);
 
 			gunBlob.sub_u8("clip",1);
-
+			
 			if (isClient())
 			{
 				gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
@@ -239,6 +247,8 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 			const u8 spread  = gunBlob.get_u8("spread");
 			const u8 b_count = gunBlob.get_u8("b_count");
 			const bool sFLB  = gunBlob.get_bool("sFLB");
+			const u32 timeSpawnedAt = params.read_u32(); // getGameTime() it spawned at
+			CMap@ map = getMap(); 
 			
 			gunBlob.sub_u8("clip",b_count);
 			
@@ -249,8 +259,13 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 				for (u8 a = 0; a < b_count; a++)
 				{
 					tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
-					//print(tempAngle + "");
 					BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+
+					for (u32 timeSpawned = timeSpawnedAt; timeSpawned < getGameTime(); timeSpawned++) // Catch up to everybody else
+					{
+						bullet.onFakeTick(map);
+					}
+
 					BulletGrouped.AddNewObj(bullet);
 				}
 			}
@@ -261,6 +276,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params)
 					f32 tempAngle = angle;
 					tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
 					BulletObj@ bullet = BulletObj(hoomanBlob,gunBlob,tempAngle,pos);
+
+					for (u32 timeSpawned = timeSpawnedAt; timeSpawned < getGameTime(); timeSpawned++) // Catch up to everybody else
+					{
+						bullet.onFakeTick(map);
+					}
+
 					BulletGrouped.AddNewObj(bullet);
 				}
 			}

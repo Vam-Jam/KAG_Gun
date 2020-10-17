@@ -15,6 +15,7 @@ void shootGun(const u16 gunID, const f32 aimangle, const u16 hoomanID, const Vec
 	params.write_netid(gunID);
 	params.write_f32(aimangle);
 	params.write_Vec2f(pos);
+	params.write_u32(getGameTime());
 
 	rules.SendCommand(rules.getCommandID("fireGun"), params);
 }
@@ -28,6 +29,7 @@ void shootShotgun(const u16 gunID, const f32 aimangle, const u16 hoomanID, const
 	params.write_netid(gunID);
 	params.write_f32(aimangle);
 	params.write_Vec2f(pos);
+	params.write_u32(getGameTime());
 
 	rules.SendCommand(rules.getCommandID("fireShotgun"), params);
 }
