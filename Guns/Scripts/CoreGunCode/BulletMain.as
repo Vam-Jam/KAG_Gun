@@ -95,7 +95,7 @@ void RenderingBullets() // Bullets
 	{
 		Render::RawQuads("Bullet.png", v_r_bullet);
 
-		if (g_debug < 0) // useful for lerp testing
+		if (g_debug == 0) // useful for lerp testing
 		{
 			v_r_bullet.clear();
 		}
