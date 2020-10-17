@@ -308,29 +308,31 @@ class BulletHolder
 	void FakeOnTick(CRules@ this)
 	{
 		CMap@ map = getMap();
-		for(int a = 0; a < bullets.length(); a++)
+		for (int a = 0; a < bullets.length(); a++)
 		{
 			BulletObj@ bullet = bullets[a];
-			if(bullet.onFakeTick(map))
+			if (bullet.onFakeTick(map))
 			{
 				bullets.erase(a);
+				a--;
 			}
 		}
 		//print(bullets.length() + '');
 		 
 		for(int a = 0; a < PParticles.length(); a++)
 		{
-			if(PParticles[a].ttl == 0)
+			if (PParticles[a].ttl == 0)
 			{
 				PParticles.erase(a);
+				a--;
 				continue;
 			}
 			PParticles[a].FakeTick();
 		}
 
-		if(localRecoil !is null)
+		if (localRecoil !is null)
 		{
-			if(localRecoil.TimeToNormal < 1)
+			if (localRecoil.TimeToNormal < 1)
 			{
 				@localRecoil = null;
 			}
