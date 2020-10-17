@@ -319,7 +319,7 @@ class BulletHolder
 		}
 		//print(bullets.length() + '');
 		 
-		for(int a = 0; a < PParticles.length(); a++)
+		for (int a = 0; a < PParticles.length(); a++)
 		{
 			if (PParticles[a].ttl == 0)
 			{
@@ -373,7 +373,7 @@ class BulletHolder
 	
 	void FillArray()
 	{
-		for(int a = 0; a < bullets.length(); a++)
+		for (int a = 0; a < bullets.length(); a++)
 		{
 			bullets[a].JoinQueue();
 		}
