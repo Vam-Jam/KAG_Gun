@@ -1,5 +1,13 @@
-//TODO recoil over time
-
+//////////////////////////////////////////////////////
+//
+//  Recoil.as - Vamist (old code)
+//
+//  To disable recoil on a gun, set  
+//  G_RECOIL to 0, G_RANDOMY & X to false
+//
+//  To enable set
+//  G_RECOIL to -10, G_RANDOMX and or Y to true
+//
 
 class Recoil
 {
@@ -19,9 +27,9 @@ class Recoil
 		{
 			return;
 		}
+
 		@Blob = blob;
 		@BlobControls = Blob.getControls();
-		//@BlobControls = blob.getControls();
 		RX = randomX;
 		RY = randomY;
 		ReturnTime = returnTime;
@@ -34,30 +42,32 @@ class Recoil
 
 	void onFakeTick()
 	{
-		if(TimeToNormal < 1)
+		if (TimeToNormal < 1)
 		{
 			return;
 		}
-		if(Blob is null)
+
+		if (Blob is null)
 		{
 			TimeToNormal == 0;
 			return;
 		}
+
 		TimeToNormal--;
 		yTick -= DecayRate;
-		if(RX && ReturnTime < TimeToNormal)
+		if (RX && ReturnTime < TimeToNormal)
 		{
 			int rNum = XORRandom(-DecayRate * 2);
-			if(XORRandom(2) == 0){
+			if (XORRandom(2) == 0){
 				xTick -= rNum;
 			}
 			else {
 				xTick += rNum;
 			}
 		}
+
 		BlobControls.setMousePosition(BlobControls.getMouseScreenPos() + Vec2f(xTick,yTick));
 		ShakeScreen(Vec2f(xTick,yTick),150,Blob.getInterpolatedPosition());
-
 	}
 }
 
