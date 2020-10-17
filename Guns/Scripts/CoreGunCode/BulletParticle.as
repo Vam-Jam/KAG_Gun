@@ -4,8 +4,6 @@
 //
 //  Particles that come out of your gun when you shoot
 //  
-//  Known bug: Sound doesnt play if particle doesnt fall
-//             One or more tiles
 
 class PrettyParticle
 {
