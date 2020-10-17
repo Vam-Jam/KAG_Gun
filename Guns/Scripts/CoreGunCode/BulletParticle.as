@@ -1,14 +1,22 @@
+//////////////////////////////////////////////////////
+//
+//  BulletParticles.as - Vamist
+//
+//  Particles that come out of your gun when you shoot
+//  
+//  Known bug: Sound doesnt play if particle doesnt fall
+//             One or more tiles
+
 class PrettyParticle
 {
 	CParticle@ Particle = ParticleRaw();
-	int ttl;
+	u16 ttl;
 	SColor col;
 	
 	PrettyParticle(CParticle@ p, const u8 pattern)
 	{
-		if(p is null){
-			return;
-		}
+		if (p is null) { return; }
+
 		switch(pattern)
 		{
 			case 0://muzzle flash
@@ -34,30 +42,31 @@ class PrettyParticle
 			}
 			break;
 
-			case 1:
+			case 1: // never got round to adding more apparently
 			{
 
 			}
 			break;
-
 		}
 	}
 
 	void FakeTick()
 	{
-	
-		if(ttl == 1)
+		if (ttl == 1)
 		{
 			col.setAlpha(0);
 			Particle.forcecolor = col;
 			ttl--;
 			return;
 		}
+
 		ttl--;
+
 		col.setAlpha(col.getAlpha() - 24);
 		col.setRed(col.getRed() - 20);
 		col.setGreen(col.getGreen() - 15);
 		col.setBlue(col.getBlue() - 4);
+
 		Particle.forcecolor = col;
 		//Particle.gravity = Vec2f(0,0.001);
 	}
