@@ -1,48 +1,57 @@
+//////////////////////////////////////////////////////
+//
+//  BulletMain.as - Vamist
+//
+//  CORE FILE
+//  
+//  A bit messy, stuff gets removed and added as time 
+//  goes on. Handles spawning bullets and making sure
+//  clients can render bullets
+//
+//  Try not poke around here unless you need to
+//  Some code here is messy
+//
+
 #include "GunHitters.as";
 #include "BulletTrails.as";
 #include "BulletClass.as";
 #include "BulletCase.as";
 
-//todo
-//u
-//v
-//vertex textures for bullets
-//learn it 
+// I would use blob.getNetworkID, but without some major changes
+// It would be the same pattern every time
+// This value resets every time a new player joins
 //
-//
-//
-//on join sync bullet count to the new person for each gun, or existing?
+// TODO-> SERVER SENDS RANDOM VALUE ON NEW PLAYER JOIN (DIFFERENT SEED)
+Random@ r = Random(12345);
 
-Random@ r = Random(12345);//amazing
-//used to sync numbers between clients *assuming* they have run it the same amount of times 
-//as everybody else
-//(which they should UNLESS kag breaks with bad deltas or other weird net issues)
-
-
+// Core vars
 BulletHolder@ BulletGrouped = BulletHolder();
+
 Vertex[] v_r_bullet;
 Vertex[] v_r_fade;
 Vertex[] v_r_reloadBox;
+
 SColor white = SColor(255,255,255,255);
 SColor eatUrGreens = SColor(255,0,255,0);
 int FireGunID;
 int FireShotgunID;
+//
 
+// Set commands, add render:: (only do this once)
 void onInit(CRules@ this)
 {
 	Reset(this);
-	Render::addScript(Render::layer_postworld, "BulletMain", "SeeMeFlyyyy", 0.0f);
-	Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
+
+	if (isClient())
+	{
+		Render::addScript(Render::layer_postworld, "BulletMain", "GunRender", 0.0f);
+		Render::addScript(Render::layer_prehud, "BulletMain", "GUIStuff", 0.0f);
+	}
 }
 
 void onRestart(CRules@ this)
 {
 	Reset(this);
-}
-
-void onTick(CRules@ this)
-{
-	BulletGrouped.FakeOnTick(this);
 }
 
 void Reset(CRules@ this)
@@ -54,73 +63,69 @@ void Reset(CRules@ this)
 	v_r_fade.clear();
 }
 
-void SeeMeFlyyyy(int id)//New onRender
+void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	CMap@ map = getMap();
-	CRules@ rules = getRules();
-	ok(map,rules);
+	r.Reset(12345);
 }
 
+// Handles making every bullet go weeee
+void onTick(CRules@ this)
+{
+	BulletGrouped.FakeOnTick(this);
+}
 
-void GUIStuff(int id)//Second new render
+void GunRender(int id)
+{
+	RenderingBullets();
+}
+
+void GUIStuff(int id)
 {
 	renderScreenpls();
 }
 
-
-void ok(CMap@ map,CRules@ rules)//Bullets
+void RenderingBullets() // Bullets
 {
-
-	//v_r_fade.clear();
-	//Render::SetAlphaBlend(true);
-	BulletGrouped.FillArray();//fill up the vortex with what we need
-	if(v_r_bullet.length() > 0)//if we didnt do that no reason
+	BulletGrouped.FillArray(); // Fill up v_r_bullets
+	if (v_r_bullet.length() > 0) // If there are no bullets on our screen, dont render
 	{
-		Render::RawQuads("Bullet.png", v_r_bullet);//r e n d e r my child
-		v_r_bullet.clear();//and we clean all
+		Render::RawQuads("Bullet.png", v_r_bullet);
+		v_r_bullet.clear();
 	}
-
-	/*if(v_r_fade.length() > 0)//same as above but not in use
-	{
-		Render::RawQuads("fade.png", v_r_fade);
-		v_r_fade.clear();
-	}*/
-
 }
 
-void renderScreenpls()//GUI
+void renderScreenpls() // Bullet ammo gui
 {
-	///Bullet Ammo
 	CBlob@ holder = getLocalPlayerBlob();           
-	if(holder !is null) 
+	if (holder !is null) 
 	{
 		CBlob@ b = holder.getAttachments().getAttachmentPointByName("PICKUP").getOccupied(); 
-		CPlayer@ p = holder.getPlayer(); //get player holding this
+		CPlayer@ p = holder.getPlayer(); // get player holding this
 
-		if(b !is null && p !is null) 
+		if (b !is null && p !is null) 
 		{
-			if(b.exists("clip"))//make sure its a valid gun
+			if (b.exists("clip")) // make sure its a valid gun
 			{
-				if(p.isMyPlayer() && b.isAttached())
+				if (p.isMyPlayer() && b.isAttached())
 				{
 					uint8 clip = b.get_u8("clip");
-					uint8 total = b.get_u8("total");//get clip and ammo total for easy access later
+					uint8 total = b.get_u8("total"); // get clip and ammo total for easy access later
 					CControls@ controls = getControls();
-					Vec2f pos = Vec2f(0,getScreenHeight()-80);//controls for screen position
-					bool render = false;//used to save render time (more fps basically)
+					Vec2f pos = Vec2f(0,getScreenHeight()-80); // controls for screen position
+					bool render = false; // used to save render time (more fps basically)
 
-					if(controls !is null)
+					if (controls !is null)
 					{
 						int length = (pos - controls.getMouseScreenPos() - Vec2f(-30,-35)).Length();
-						//get length for 'fancy' invisiblty when mouse goes near it
+						// get length for 'fancy' invisiblty when mouse goes near it
 
-						if(length < 256 && length > 0)//are we near it?
+						if (length < 256 && length > 0) // are we near it?
 						{
 							white.setAlpha(length);
 							eatUrGreens.setAlpha(length);
 							render = true;
 						}
-						else//check the reverse
+						else // check the reverse
 						{
 							length=-length;
 							if(length < 256 && length > 0)
@@ -132,60 +137,61 @@ void renderScreenpls()//GUI
 						}
 					}
 						
-					if(v_r_reloadBox.length() < 1 || render)//is it time to render?
+					if (v_r_reloadBox.length() < 1 || render) // is it time to render?
 					{
-						if(render)//lets clear only IF we need to
+						if (render) // lets clear only IF we need to
 						{
 							v_r_reloadBox.clear();
 						}
-						v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y,    0, 1, 0, white)); //top right
-						v_r_reloadBox.push_back(Vertex(pos.x, pos.y,        0, 0, 0, white)); //top left
-						v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     0, 0, 1, white)); //bot left
-						v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80, 0, 1, 1, white)); //bot right
-					}
-					Render::SetTransformScreenspace();//set position for render
-					Render::SetAlphaBlend(true);//since we are going to be doing the invisiblity thing
-					Render::RawQuads("ammoBorder.png", v_r_reloadBox);//render!
 
-					pos = Vec2f(15,getScreenHeight() - 68);//positions for the GUI
+						v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y,    0, 1, 0, white)); // top right
+						v_r_reloadBox.push_back(Vertex(pos.x, pos.y,        0, 0, 0, white)); // top left
+						v_r_reloadBox.push_back(Vertex(pos.x, pos.y+80,     0, 0, 1, white)); // bot left
+						v_r_reloadBox.push_back(Vertex(pos.x+112, pos.y+80, 0, 1, 1, white)); // bot right
+					}
+
+					Render::SetTransformScreenspace(); // set position for render
+					Render::SetAlphaBlend(true); // since we are going to be doing the invisiblity thing
+					Render::RawQuads("ammoBorder.png", v_r_reloadBox); // render!
+
+					pos = Vec2f(15,getScreenHeight() - 68); // positions for the GUI
 					GUI::DrawText(clip+"/"+total, pos, eatUrGreens);
 
 					pos = Vec2f(15,getScreenHeight() - 58);
 
-					if(b.get_bool("doReload")) 
+					if (b.get_bool("doReload")) 
 					{
 						GUI::DrawText("Reloading...", pos, eatUrGreens);
 					} 
-					else if(clip == 0 && total > 0 && !b.get_bool("beginReload")) 
+					else if (clip == 0 && total > 0 && !b.get_bool("beginReload")) 
 					{
 						GUI::DrawText("Press R to \nreload or \nshoot again!", pos, eatUrGreens);
 					} 
-					else if(clip == 0 && total == 0) 
+					else if (clip == 0 && total == 0) 
 					{
 						GUI::DrawText("No more \nammo, find \nanother \nweapon!", pos, eatUrGreens);
 					}
-
 				}
 			}
-			else
+			else // We might not be holding a gun, so lets clear the box
 			{
-				if(v_r_reloadBox.length() > 0)//doesnt run anyway, cant remember why this is here
+				if (v_r_reloadBox.length() > 0)
 				{
-					v_r_reloadBox.clear();//so its best not to remove it
+					v_r_reloadBox.clear();
 				}
 			}
-		}   
-		   
+		}      
 	}
 }
 
-void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
-	if(cmd == FireGunID)
+void onCommand(CRules@ this, u8 cmd, CBitStream @params) 
+{
+	if (cmd == FireGunID)
 	{
 		CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());
 		CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
 
-		if(hoomanBlob !is null && gunBlob !is null)
+		if (hoomanBlob !is null && gunBlob !is null)
 		{  
 			f32 angle = params.read_f32();
 			const Vec2f pos = params.read_Vec2f();
@@ -193,25 +199,23 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 			BulletGrouped.AddNewObj(bullet);
 
 			gunBlob.sub_u8("clip",1);
-			gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
 
-			if(hoomanBlob.isFacingLeft())
+			if (isClient())
 			{
-				f32 oAngle = (angle % 360) + 180;
-				ParticleCase2("Case.png",pos,oAngle);
-			}
-			else
-			{
-				ParticleCase2("Case.png",pos,angle);
-			}
+				gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
+				if (hoomanBlob.isFacingLeft())
+				{
+					f32 oAngle = (angle % 360) + 180;
+					ParticleCase2("Case.png",pos,oAngle);
+				}
+				else
+				{
+					ParticleCase2("Case.png",pos,angle);
+				}
 
-			if(isClient())
-			{
 				CBlob@ localBlob = getLocalPlayerBlob();
-				if(localBlob != null && localBlob is hoomanBlob)//if we are this blob
-				{//RECOIL TIME
-					//(CBlob@ blob,Vec2f velocity, u16 TimeToEnd, Vec2f startPos)
-					//	this.set_u16("recoil"      ,G_RECOIL);
+				if(localBlob !is null && localBlob is hoomanBlob) // if we are this blob
+				{
 					const int recoil = gunBlob.get_s16("recoil");
 					const bool rx = gunBlob.get_bool("recoil_random_x");
 					const bool ry = gunBlob.get_bool("recoil_random_y");
@@ -220,17 +224,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 					Recoil@ coil = Recoil(localBlob,recoil,recoilTime,recoilBackTime,rx,ry);
 					BulletGrouped.NewRecoil(@coil);
 				}
-				//BulletGrouped.addNewParticle(ParticlePixelUnlimited(newPos,Vec2f(0,0),
-					//SColor(255,255,100,100),false),0);
 			}
 		}
 	}
-	else if(cmd == FireShotgunID)
+	else if (cmd == FireShotgunID)
 	{
 		CBlob@ hoomanBlob = getBlobByNetworkID(params.read_netid());  
 		CBlob@ gunBlob    = getBlobByNetworkID(params.read_netid());
 
-		if(hoomanBlob !is null && gunBlob !is null)
+		if (hoomanBlob !is null && gunBlob !is null)
 		{  
 			const f32 angle  = params.read_f32();
 			const Vec2f pos  = params.read_Vec2f();
@@ -239,13 +241,12 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 			const bool sFLB  = gunBlob.get_bool("sFLB");
 			
 			gunBlob.sub_u8("clip",b_count);
-			gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
 			
 			if(sFLB)
 			{
 				f32 tempAngle = angle;
 
-				for(u8 a = 0; a < b_count; a++)
+				for (u8 a = 0; a < b_count; a++)
 				{
 					tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
 					//print(tempAngle + "");
@@ -255,7 +256,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 			}
 			else
 			{
-				for(u8 a = 0; a < b_count; a++)
+				for (u8 a = 0; a < b_count; a++)
 				{
 					f32 tempAngle = angle;
 					tempAngle += r.NextRanged(2) != 0 ? -r.NextRanged(spread) : r.NextRanged(spread);
@@ -264,23 +265,23 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 				}
 			}
 
-			if(hoomanBlob.isFacingLeft())
+			if (isClient())
 			{
-				f32 oAngle = (angle % 360) + 180;
-				ParticleCase2("Case.png",pos,oAngle);
-			}
-			else
-			{
-				ParticleCase2("Case.png",pos,angle);
-			}
+				gunBlob.getSprite().PlaySound(gunBlob.get_string("sound"));
 
-			if(isClient())
-			{
+				if(hoomanBlob.isFacingLeft())
+				{
+					f32 oAngle = (angle % 360) + 180;
+					ParticleCase2("Case.png",pos,oAngle);
+				}
+				else
+				{
+					ParticleCase2("Case.png",pos,angle);
+				}
+
 				CBlob@ localBlob = getLocalPlayerBlob();
-				if(localBlob != null && localBlob is hoomanBlob)//if we are this blob
-				{//RECOIL TIME
-					//(CBlob@ blob,Vec2f velocity, u16 TimeToEnd, Vec2f startPos)
-					//	this.set_u16("recoil"      ,G_RECOIL);
+				if(localBlob != null && localBlob is hoomanBlob)
+				{
 					const int recoil = gunBlob.get_s16("recoil");
 					const bool rx = gunBlob.get_bool("recoil_random_x");
 					const bool ry = gunBlob.get_bool("recoil_random_y");
@@ -290,14 +291,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream @params) {
 					BulletGrouped.NewRecoil(@coil);
 				}
 			}
-			
 		}
-
-		/*f32 tempAngle = aimangle;
-		for(uint8 a = 0; a < BUL_PER_SHOT; a++)
-		{
-			aimangle += XORRandom(2) == 0 ? -XORRandom(B_SPREAD) : XORRandom(B_SPREAD);
-			shoot(this, aimangle, holder);
-		}*/
 	}
 }
