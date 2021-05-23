@@ -16,7 +16,7 @@ So with the recent release of the new Render:: binds, I decided to create a new 
 
 To start with, we need visuals. So the new Render:: binds allow us to send raw vertices to irrlicht, give it a texture and have it appear in game. This is good for our use case of just rendering a small sprite.
 
-For logic, I just made a simple bullet class that keeps track of some important vars, such as position, last position (for interpalation & raycasting), current gravity & velocity and so on.
+For logic, I just made a simple bullet class that keeps track of some important vars, such as position, last position (for interpolation & raycasting), current gravity & velocity and so on.
 The class relies on 2 hooks, onTick and onRender.
 - onTick handles physics, raycasting and killing the bullet if it's lived too long.
 - onRender handles drawing the bullet
