@@ -3,10 +3,10 @@
 
 # Why does this exist?
 
-Previously in kag, to make a bullet, the only 2 ways you could do it was to use a blob, or raycast.<br />
-Raycast is the 'cheap' way to make a bullet, its cheaper then a blob in terms of resources, faster, but with more limitations, like not being effected by gravity (unless you split it up over multiple ticks) and a lack of visual fidelity.
+Previously in kag, to make a bullet, the only 2 ways you could do it was to use a blob, or raycasting.<br />
+Raycasting is the 'cheap' way to make a bullet, its cheaper then a blob in terms of resources, faster, but with more limitations, like not being effected by gravity (unless you split it up over multiple ticks) and a lack of visual fidelity.
 
-Using a Blob is the other way of making a bullet. Easy to do, but blob's have a lot of overhead when being made, and making them too quickly causes a lot of issues. (Random crashes (due to blobs being complex) and weird physics (box2d & kag glue) to name a few). In return you could do some complex stuff visually and easily, or have bullets travel in silly ways effortlessly.
+Using a blob is the other way of making a bullet. Easy to do, but blob's have a lot of overhead when being made, and making them too quickly causes a lot of issues (Random crashes (due to blobs being complex) and weird physics (box2d & kag glue) to name a few). In return you could do some complex stuff visually and easily, or have bullets travel in silly ways effortlessly as an example.
 <br >
 Jenny (The creator of the Wild Wasteland (https://www.youtube.com/watch?v=VWRoJbgzh6k&feature=youtu.be)) created a WW2 mod in kag, using the blob style bullets. The biggest issue was random crashes & the bullets going through tiles. I spent a while trying to fix bullets going through walls, but turned out to be an issue with box2d & entities going too fast.
 
@@ -21,7 +21,7 @@ The class relies on 2 hooks, onTick and onRender.
 - onTick handles physics, raycasting and killing the bullet if it's lived too long.
 - onRender handles drawing the bullet
 
-Todo: Write up about how we handle shoot & high ping 
+Todo: Write up about how we handle shoot & high ping
 
 # Can i use it?
 
